@@ -1,0 +1,77 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /ZinAI/
+
+  # HTTPSリダイレクト（必要に応じてコメントアウトを解除）
+  # RewriteCond %{HTTPS} off
+  # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # 静的ファイルとディレクトリは直接提供
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+
+  # すべてのリクエストをindex.htmlにリダイレクト（React Routerのため）
+  RewriteRule . /ZinAI/index.html [L]
+</IfModule>
+
+# セキュリティヘッダー
+<IfModule mod_headers.c>
+  # XSS保護
+  Header set X-XSS-Protection "1; mode=block"
+
+  # クリックジャッキング対策
+  Header always append X-Frame-Options SAMEORIGIN
+
+  # MIMEタイプスニッフィング防止
+  Header set X-Content-Type-Options "nosniff"
+
+  # リファラーポリシー
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# キャッシュ設定
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # 画像ファイル
+  ExpiresByType image/jpg "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+
+  # CSS and JavaScript
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+
+  # フォント
+  ExpiresByType font/ttf "access plus 1 year"
+  ExpiresByType font/otf "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType application/font-woff "access plus 1 year"
+
+  # HTML（頻繁に更新される場合は短めに）
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# Gzip圧縮
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE text/xml
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/x-javascript
+  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE application/xhtml+xml
+  AddOutputFilterByType DEFLATE application/rss+xml
+  AddOutputFilterByType DEFLATE application/atom_xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>

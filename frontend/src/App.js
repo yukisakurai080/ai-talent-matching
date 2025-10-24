@@ -13,8 +13,9 @@ import './App.css';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/ZinAI">
       <Routes>
+        <Route path="/demo" element={<CompanyApp isDemo={true} />} />
         <Route path="/login" element={<CompanyLogin />} />
         <Route path="/auth/verify" element={<CompanyLogin />} />
         <Route path="/talent/login" element={<TalentLogin />} />

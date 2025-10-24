@@ -4,7 +4,7 @@ import axios from 'axios';
 import './JobListApp.css';
 import translations from './jobListTranslations';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function JobListApp() {
   const navigate = useNavigate();

@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import './TalentApp.css';
 import translations from './translations';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function TalentApp() {
   const [searchParams] = useSearchParams();

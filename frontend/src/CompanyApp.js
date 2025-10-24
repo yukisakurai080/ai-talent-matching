@@ -4,9 +4,9 @@ import axios from 'axios';
 import './App.css';
 import './CompanyApp.css';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-function CompanyApp() {
+function CompanyApp({ isDemo = false }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -107,6 +107,19 @@ function CompanyApp() {
 
   // 認証チェック
   useEffect(() => {
+    // デモモードの場合は認証をスキップ
+    if (isDemo) {
+      setUser({
+        _id: 'demo-user',
+        email: 'demo@company.com',
+        name: 'デモ企業',
+        userType: 'company',
+        isDemo: true
+      });
+      setAuthLoading(false);
+      return;
+    }
+
     const checkAuth = async () => {
       try {
         const response = await axios.get(`${API_URL}/auth/me`, {
@@ -125,7 +138,7 @@ function CompanyApp() {
     };
 
     checkAuth();
-  }, [navigate]);
+  }, [navigate, isDemo]);
 
   useEffect(() => {
     if (!user) return;

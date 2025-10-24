@@ -11,12 +11,12 @@ const generalLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// AI検索用の厳しい制限: 1時間に10リクエストまで
+// AI検索用の厳しい制限: 1時間に50リクエストまで
 const aiSearchLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1時間
-  max: 10,
+  max: 50,
   message: {
-    error: 'AI検索のリクエストが多すぎます。1時間に10回までご利用いただけます。'
+    error: 'AI検索のリクエストが多すぎます。1時間に50回までご利用いただけます。'
   },
   standardHeaders: true,
   legacyHeaders: false,

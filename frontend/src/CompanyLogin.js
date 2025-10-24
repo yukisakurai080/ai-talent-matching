@@ -176,6 +176,35 @@ function CompanyLogin() {
           </div>
         )}
 
+        <div className="demo-link" style={{ marginTop: '20px', textAlign: 'center' }}>
+          <button
+            onClick={() => navigate('/demo')}
+            className="demo-button"
+            style={{
+              width: '100%',
+              padding: '12px',
+              background: '#f0f0f0',
+              color: '#333',
+              border: '2px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '16px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = '#e0e0e0';
+              e.target.style.borderColor = '#bbb';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = '#f0f0f0';
+              e.target.style.borderColor = '#ddd';
+            }}
+          >
+            🎭 デモを試す（ログイン不要）
+          </button>
+        </div>
+
         <div className="login-footer">
           <p>初めての方は「新規登録」にチェックを入れてください</p>
         </div>
