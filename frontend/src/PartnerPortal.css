@@ -1,0 +1,1227 @@
+/* パートナーログイン */
+.partner-login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 20px;
+}
+
+.partner-login-box {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.partner-login-box h1 {
+  margin-bottom: 10px;
+  color: #10b981;
+  text-align: center;
+}
+
+.login-subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+
+.partner-login-form .form-group {
+  margin-bottom: 20px;
+}
+
+.partner-login-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 500;
+}
+
+.partner-login-form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #ffffff !important;
+  color: #111827 !important;
+  transition: border-color 0.3s;
+}
+
+.partner-login-form input:focus {
+  outline: none;
+  border-color: #10b981 !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+.partner-login-button {
+  width: 100%;
+  padding: 14px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.partner-login-button:hover {
+  background: #059669;
+}
+
+/* パートナーポータル */
+.partner-portal {
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+.partner-header {
+  background: white;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.partner-header h1 {
+  margin: 0;
+  color: #10b981;
+  font-size: 24px;
+}
+
+.partner-org-name {
+  margin: 5px 0 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.partner-logout-btn {
+  padding: 10px 20px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #374151;
+}
+
+.partner-logout-btn:hover {
+  background: #f9fafb;
+  border-color: #10b981;
+  color: #10b981;
+}
+
+/* タブ */
+.partner-tabs {
+  background: white;
+  padding: 0 40px;
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab-button {
+  padding: 15px 25px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  transition: all 0.3s;
+}
+
+.tab-button:hover {
+  color: #10b981;
+}
+
+.tab-button.active {
+  color: #10b981;
+  border-bottom-color: #10b981;
+}
+
+/* コンテンツエリア */
+.partner-content {
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ダッシュボード */
+.dashboard-tab h2 {
+  margin-bottom: 30px;
+  color: #1f2937;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+}
+
+.stat-card h3 {
+  margin: 0 0 15px 0;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-number {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.stat-code {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  font-family: monospace;
+}
+
+.stat-text {
+  margin: 0;
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.quick-actions {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.quick-actions h3 {
+  margin: 0 0 20px 0;
+  color: #1f2937;
+}
+
+.action-btn {
+  margin-right: 15px;
+  padding: 12px 24px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.action-btn:hover {
+  background: #059669;
+}
+
+/* CSV一括登録 */
+.csv-tab h2 {
+  margin-bottom: 30px;
+  color: #1f2937;
+}
+
+.csv-template-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 30px;
+}
+
+.csv-template-section h3 {
+  margin: 0 0 15px 0;
+  color: #1f2937;
+}
+
+.download-template-btn {
+  padding: 12px 24px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  margin: 15px 0;
+  transition: background 0.3s;
+}
+
+.download-template-btn:hover {
+  background: #059669;
+}
+
+.template-example {
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 6px;
+  margin: 15px 0;
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+}
+
+.template-example code {
+  font-family: monospace;
+  font-size: 12px;
+  color: #1f2937;
+}
+
+.csv-note {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 10px 0 0 0;
+}
+
+.csv-instructions {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.csv-instruction-section {
+  margin-bottom: 20px;
+}
+
+.csv-instruction-section:last-child {
+  margin-bottom: 0;
+}
+
+.csv-instruction-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 10px 0;
+}
+
+.csv-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.csv-example-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.csv-example-label {
+  font-weight: 500;
+  color: #374151;
+  min-width: 80px;
+}
+
+.csv-example-value {
+  color: #10b981;
+  font-family: monospace;
+}
+
+.csv-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.csv-option-item {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.csv-option-label {
+  font-weight: 500;
+  color: #374151;
+  margin-right: 4px;
+}
+
+.csv-option-value {
+  color: #6b7280;
+}
+
+.csv-upload-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+#csv-file-input {
+  display: none;
+}
+
+.csv-upload-label {
+  display: inline-block;
+  padding: 14px 30px;
+  background: #10b981;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.csv-upload-label:hover {
+  background: #059669;
+}
+
+.file-selected {
+  margin-top: 15px;
+  color: #10b981;
+  font-weight: 500;
+}
+
+.csv-preview {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 30px;
+}
+
+.csv-preview h3 {
+  margin: 0 0 20px 0;
+  color: #1f2937;
+}
+
+.csv-table-container {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.csv-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.csv-table th {
+  background: #f9fafb;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #1f2937;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.csv-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #6b7280;
+}
+
+.more-rows {
+  text-align: center;
+  color: #6b7280;
+  margin: 10px 0 0 0;
+}
+
+.bulk-register-btn {
+  width: 100%;
+  padding: 14px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.bulk-register-btn:hover {
+  background: #059669;
+}
+
+.upload-result {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.upload-result h3 {
+  margin: 0 0 15px 0;
+  color: #1f2937;
+}
+
+.upload-result p {
+  margin: 5px 0;
+  color: #6b7280;
+}
+
+.error-details {
+  margin-top: 20px;
+  padding: 20px;
+  background: #fef2f2;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
+}
+
+.error-details h4 {
+  margin: 0 0 10px 0;
+  color: #dc2626;
+}
+
+.error-details p {
+  margin: 5px 0;
+  color: #991b1b;
+  font-size: 14px;
+}
+
+/* QRコード生成 */
+.qr-tab h2 {
+  margin-bottom: 30px;
+  color: #1f2937;
+}
+
+.qr-form {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 30px;
+}
+
+.qr-form .form-group {
+  margin-bottom: 20px;
+}
+
+.qr-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.qr-form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #ffffff !important;
+  color: #111827 !important;
+  transition: border-color 0.3s;
+}
+
+.qr-form input:focus {
+  outline: none;
+  border-color: #10b981 !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+.generate-qr-btn {
+  width: 100%;
+  padding: 14px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.generate-qr-btn:hover {
+  background: #059669;
+}
+
+.qr-codes-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.qr-codes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.qr-codes-header h3 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.print-qr-btn {
+  padding: 10px 20px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.print-qr-btn:hover {
+  background: #059669;
+}
+
+.qr-codes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.qr-code-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.qr-code-card:hover {
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+}
+
+.qr-code-card h4 {
+  margin: 0 0 15px 0;
+  color: #1f2937;
+}
+
+.qr-code-card img {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  display: block;
+}
+
+.qr-expire {
+  margin: 10px 0 5px 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.qr-code-text {
+  margin: 0 0 10px 0;
+  font-family: monospace;
+  color: #10b981;
+  font-weight: 600;
+}
+
+.delete-qr-btn {
+  width: 100%;
+  padding: 8px 16px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
+  transition: background 0.3s;
+}
+
+.delete-qr-btn:hover {
+  background: #dc2626;
+}
+
+@media print {
+  .delete-qr-btn {
+    display: none;
+  }
+}
+
+/* 登録済み人材 */
+.talents-tab h2 {
+  margin-bottom: 30px;
+  color: #1f2937;
+}
+
+.talents-search-section {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 30px;
+}
+
+.talents-search-section input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #ffffff !important;
+  color: #111827 !important;
+  transition: border-color 0.3s;
+}
+
+.talents-search-section input:focus {
+  outline: none;
+  border-color: #10b981 !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+.talents-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.talent-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.talent-card:hover {
+  background: #f0fdf4;
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+}
+
+.talent-card h3 {
+  margin: 0 0 15px 0;
+  color: #1f2937;
+  font-size: 18px;
+}
+
+.talent-info p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.talent-info strong {
+  color: #1f2937;
+}
+
+/* 人材詳細モーダル */
+.talent-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.talent-detail-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.talent-detail-header {
+  padding: 0;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+  border-radius: 12px 12px 0 0;
+  flex-shrink: 0;
+}
+
+.talent-detail-header h2 {
+  font-size: 22px;
+  color: #111827;
+  font-weight: 600;
+  margin: 0;
+  padding: 20px 28px;
+  flex: 1;
+}
+
+.talent-detail-close-btn {
+  min-width: 60px;
+  padding: 20px;
+  border-radius: 0 12px 0 0;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.talent-detail-close-btn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.talent-detail-body {
+  padding: 28px;
+}
+
+.talent-detail-section {
+  margin-bottom: 24px;
+}
+
+.talent-detail-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.talent-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.talent-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.talent-detail-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.talent-detail-value {
+  font-size: 14px;
+  color: #111827;
+}
+
+.talent-detail-full {
+  grid-column: 1 / -1;
+}
+
+.talent-detail-actions {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.delete-talent-btn {
+  width: 100%;
+  padding: 12px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.delete-talent-btn:hover {
+  background: #dc2626;
+}
+
+/* 成約料・保証期間設定タブ */
+.fee-settings-tab h2 {
+  margin-bottom: 30px;
+  color: #1f2937;
+}
+
+.fee-settings-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 30px;
+}
+
+.fee-settings-section h3 {
+  margin: 0 0 20px 0;
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.section-description {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.fee-settings-section .form-group {
+  margin-bottom: 20px;
+}
+
+.fee-settings-section label {
+  display: block;
+  margin-bottom: 8px;
+  color: #111827;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.fee-settings-section .form-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #ffffff !important;
+  color: #111827 !important;
+  transition: border-color 0.3s;
+}
+
+.fee-settings-section .form-input:focus {
+  outline: none;
+  border-color: #10b981 !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+.fee-settings-section .form-input.small {
+  max-width: 150px;
+}
+
+.fee-calculation {
+  background: #f9fafb;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.calculation-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-size: 15px;
+  color: #374151;
+}
+
+.calculation-row.total {
+  border-top: 2px solid #e5e7eb;
+  margin-top: 10px;
+  padding-top: 15px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #1f2937;
+}
+
+.calculation-row .amount {
+  font-weight: 600;
+  color: #10b981;
+}
+
+.calculation-row .amount.negative {
+  color: #ef4444;
+}
+
+.calculation-row.total .amount {
+  font-size: 20px;
+  color: #10b981;
+}
+
+.guarantee-period-item {
+  background: #f9fafb;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #e5e7eb;
+}
+
+.guarantee-period-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.guarantee-period-header h4 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.guarantee-period-inputs {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.guarantee-period-inputs .form-group {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.guarantee-preview {
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.refund-amount {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.add-button {
+  padding: 12px 24px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.add-button:hover {
+  background: #059669;
+}
+
+.remove-button {
+  padding: 12px 20px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background 0.3s;
+  white-space: nowrap;
+}
+
+.remove-button:hover {
+  background: #dc2626;
+}
+
+.remove-button:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+.fee-settings-actions {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.save-button {
+  padding: 14px 40px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.save-button:hover {
+  background: #059669;
+}
+
+/* エンゲージメント分析 */
+.analytics-section {
+  margin: 40px 0;
+}
+
+.analytics-section h2 {
+  margin-bottom: 30px;
+  color: #1f2937;
+  font-size: 24px;
+}
+
+.analytics-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.analytics-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.analytics-card h3 {
+  margin: 0 0 15px 0;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.analytics-number {
+  margin: 0 0 10px 0;
+  font-size: 36px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.analytics-description {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ファネル分析 */
+.funnel-analysis {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 40px;
+}
+
+.funnel-analysis h3 {
+  margin: 0 0 25px 0;
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.funnel-chart {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.funnel-stage {
+  margin-bottom: 10px;
+}
+
+.funnel-bar {
+  padding: 15px 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s;
+  min-width: 150px;
+  text-align: center;
+}
+
+.funnel-arrow {
+  text-align: center;
+  padding: 8px 0;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 人材別エンゲージメント */
+.talent-engagement {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.talent-engagement h3 {
+  margin: 0 0 20px 0;
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.engagement-table {
+  overflow-x: auto;
+}
+
+.engagement-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.engagement-table th {
+  background: #f9fafb;
+  padding: 12px 15px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.engagement-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.engagement-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.engagement-table td strong {
+  color: #10b981;
+  font-size: 16px;
+}
+
+/* 印刷用スタイル */
+@media print {
+  .partner-header,
+  .partner-tabs,
+  .qr-codes-header button,
+  .partner-logout-btn {
+    display: none;
+  }
+
+  .qr-code-card {
+    page-break-inside: avoid;
+  }
+}
