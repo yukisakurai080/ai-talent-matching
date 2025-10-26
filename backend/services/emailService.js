@@ -1,26 +1,46 @@
-const nodemailer = require('nodemailer');
+const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses');
 const EmailProxy = require('../models/EmailProxy');
 
-// メール送信設定（Xserver SMTP）
-const smtpPort = parseInt(process.env.SMTP_PORT) || 587;
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'sv14354.xserver.jp',
-  port: smtpPort,
-  secure: smtpPort === 465, // ポート465の場合のみSSL使用
-  auth: {
-    user: process.env.EMAIL_USER, // 例: info@office-tree.jp
-    pass: process.env.EMAIL_PASSWORD // メールパスワード
-  },
-  tls: {
-    rejectUnauthorized: false, // 自己署名証明書を許可
-    ciphers: 'SSLv3' // 古いSSL/TLS互換性
-  },
-  connectionTimeout: 10000, // 接続タイムアウト: 10秒
-  greetingTimeout: 10000,   // 挨拶タイムアウト: 10秒
-  socketTimeout: 10000,      // ソケットタイムアウト: 10秒
-  logger: true, // デバッグログ有効化
-  debug: true   // デバッグモード有効化
+// Amazon SES クライアント設定
+const sesClient = new SESClient({
+  region: process.env.AWS_REGION || 'ap-northeast-1',
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  }
 });
+
+/**
+ * SESでメールを送信するヘルパー関数
+ */
+const sendEmailViaSES = async ({ from, to, replyTo, subject, htmlBody }) => {
+  const params = {
+    Source: from,
+    Destination: {
+      ToAddresses: [to]
+    },
+    Message: {
+      Subject: {
+        Data: subject,
+        Charset: 'UTF-8'
+      },
+      Body: {
+        Html: {
+          Data: htmlBody,
+          Charset: 'UTF-8'
+        }
+      }
+    }
+  };
+
+  if (replyTo) {
+    params.ReplyToAddresses = [replyTo];
+  }
+
+  const command = new SendEmailCommand(params);
+  const response = await sesClient.send(command);
+  return response;
+};
 
 /**
  * 企業に応募通知メールを送信（プロキシシステム）
@@ -40,55 +60,56 @@ const sendApplicationNotification = async ({
   proxyEmail // 企業が返信する際のプロキシアドレス
 }) => {
   try {
-    const mailOptions = {
-      from: `"AI人材マッチング" <${process.env.EMAIL_USER}>`,
-      to: companyEmail,
-      replyTo: proxyEmail, // プロキシアドレスに返信
-      subject: `【新規応募】${positionTitle}に応募がありました`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #10b981;">新規応募のお知らせ</h2>
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #10b981;">新規応募のお知らせ</h2>
 
-          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0;">応募者情報</h3>
-            <p><strong>お名前:</strong> ${applicantName}</p>
-            <p><strong>電話番号:</strong> ${applicantPhone}</p>
-            <p><strong>応募ポジション:</strong> ${positionTitle}</p>
-          </div>
+        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0;">応募者情報</h3>
+          <p><strong>お名前:</strong> ${applicantName}</p>
+          <p><strong>電話番号:</strong> ${applicantPhone}</p>
+          <p><strong>応募ポジション:</strong> ${positionTitle}</p>
+        </div>
 
-          <div style="background: #fff; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0;">メッセージ内容</h3>
-            <p style="white-space: pre-wrap;">${messageContent}</p>
-          </div>
+        <div style="background: #fff; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0;">メッセージ内容</h3>
+          <p style="white-space: pre-wrap;">${messageContent}</p>
+        </div>
 
-          <div style="background: #dbeafe; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0; color: #1e40af;">
-              <strong>💡 返信方法:</strong><br>
-              このメールに直接返信すると、応募者に届きます。<br>
-              応募者のメールアドレスは非公開で、安全にやり取りできます。<br>
-              また、メッセージボックスでもやり取りを確認できます。
-            </p>
-          </div>
-
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="http://localhost:3000/"
-               style="background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block;">
-              メッセージボックスで確認
-            </a>
-          </div>
-
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-
-          <p style="color: #6b7280; font-size: 12px; text-align: center;">
-            このメールはAI人材マッチングシステムから自動送信されています。
+        <div style="background: #dbeafe; padding: 15px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 0; color: #1e40af;">
+            <strong>💡 返信方法:</strong><br>
+            このメールに直接返信すると、応募者に届きます。<br>
+            応募者のメールアドレスは非公開で、安全にやり取りできます。<br>
+            また、メッセージボックスでもやり取りを確認できます。
           </p>
         </div>
-      `
-    };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Application notification sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="http://localhost:3000/"
+             style="background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block;">
+            メッセージボックスで確認
+          </a>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+        <p style="color: #6b7280; font-size: 12px; text-align: center;">
+          このメールはAI人材マッチングシステムから自動送信されています。
+        </p>
+      </div>
+    `;
+
+    const response = await sendEmailViaSES({
+      from: `AI人材マッチング <${process.env.EMAIL_USER}>`,
+      to: companyEmail,
+      replyTo: proxyEmail,
+      subject: `【新規応募】${positionTitle}に応募がありました`,
+      htmlBody
+    });
+
+    console.log('Application notification sent:', response.MessageId);
+    return { success: true, messageId: response.MessageId };
   } catch (error) {
     console.error('Email sending error:', error);
     return { success: false, error: error.message };
@@ -108,40 +129,41 @@ const sendReplyToApplicant = async ({
   proxyEmail // 求職者が返信する際のプロキシアドレス
 }) => {
   try {
-    const mailOptions = {
-      from: `"AI人材マッチング - ${companyName}" <${process.env.EMAIL_USER}>`,
-      to: applicantEmail,
-      replyTo: proxyEmail, // プロキシアドレスに返信
-      subject: `Re: ${originalSubject}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h3 style="color: #10b981;">${companyName}からのメッセージ</h3>
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h3 style="color: #10b981;">${companyName}からのメッセージ</h3>
 
-          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p>Dear ${applicantName}様、</p>
-            <p style="white-space: pre-wrap;">${replyContent}</p>
-          </div>
+        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <p>Dear ${applicantName}様、</p>
+          <p style="white-space: pre-wrap;">${replyContent}</p>
+        </div>
 
-          <div style="background: #dbeafe; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0; color: #1e40af;">
-              <strong>💡 返信方法:</strong><br>
-              このメールに直接返信すると、企業に届きます。<br>
-              企業のメールアドレスは非公開で、安全にやり取りできます。
-            </p>
-          </div>
-
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-
-          <p style="color: #6b7280; font-size: 12px; text-align: center;">
-            このメールはAI人材マッチングシステムから自動送信されています。
+        <div style="background: #dbeafe; padding: 15px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 0; color: #1e40af;">
+            <strong>💡 返信方法:</strong><br>
+            このメールに直接返信すると、企業に届きます。<br>
+            企業のメールアドレスは非公開で、安全にやり取りできます。
           </p>
         </div>
-      `
-    };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Reply email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+        <p style="color: #6b7280; font-size: 12px; text-align: center;">
+          このメールはAI人材マッチングシステムから自動送信されています。
+        </p>
+      </div>
+    `;
+
+    const response = await sendEmailViaSES({
+      from: `AI人材マッチング - ${companyName} <${process.env.EMAIL_USER}>`,
+      to: applicantEmail,
+      replyTo: proxyEmail,
+      subject: `Re: ${originalSubject}`,
+      htmlBody
+    });
+
+    console.log('Reply email sent:', response.MessageId);
+    return { success: true, messageId: response.MessageId };
   } catch (error) {
     console.error('Reply email sending error:', error);
     return { success: false, error: error.message };
@@ -160,11 +182,7 @@ const sendRegistrationEmail = async ({
 }) => {
   try {
     const isCompany = userType === 'company';
-    const mailOptions = {
-      from: `"ZinAI人材マッチング" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: isCompany ? '【ZinAI】企業ポータル 登録用ログインリンク' : '【ZinAI】ジョブリスト 登録用ログインリンク',
-      html: `
+    const htmlBody = `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
           <!-- ヘッダー -->
           <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
@@ -250,12 +268,17 @@ const sendRegistrationEmail = async ({
             </p>
           </div>
         </div>
-      `
-    };
+      `;
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Registration email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    const response = await sendEmailViaSES({
+      from: `ZinAI人材マッチング <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: isCompany ? '【ZinAI】企業ポータル 登録用ログインリンク' : '【ZinAI】ジョブリスト 登録用ログインリンク',
+      htmlBody
+    });
+
+    console.log('Registration email sent:', response.MessageId);
+    return { success: true, messageId: response.MessageId };
   } catch (error) {
     console.error('Registration email sending error:', error);
     return { success: false, error: error.message };
