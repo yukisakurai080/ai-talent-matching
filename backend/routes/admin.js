@@ -39,7 +39,13 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const admin = await Admin.findOne({ email });
+    // emailまたはusernameで検索
+    const admin = await Admin.findOne({
+      $or: [
+        { email: email },
+        { username: email } // emailフィールドにusernameが入力されることもある
+      ]
+    });
 
     if (!admin) {
       return res.status(401).json({ error: 'メールアドレスまたはパスワードが正しくありません' });
