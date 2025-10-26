@@ -2,17 +2,24 @@ const nodemailer = require('nodemailer');
 const EmailProxy = require('../models/EmailProxy');
 
 // メール送信設定（Xserver SMTP）
+const smtpPort = parseInt(process.env.SMTP_PORT) || 587;
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'sv14354.xserver.jp',
-  port: process.env.SMTP_PORT || 465,
-  secure: true, // SSL を使用
+  port: smtpPort,
+  secure: smtpPort === 465, // ポート465の場合のみSSL使用
   auth: {
     user: process.env.EMAIL_USER, // 例: info@office-tree.jp
     pass: process.env.EMAIL_PASSWORD // メールパスワード
   },
   tls: {
-    rejectUnauthorized: false // 自己署名証明書を許可
-  }
+    rejectUnauthorized: false, // 自己署名証明書を許可
+    ciphers: 'SSLv3' // 古いSSL/TLS互換性
+  },
+  connectionTimeout: 10000, // 接続タイムアウト: 10秒
+  greetingTimeout: 10000,   // 挨拶タイムアウト: 10秒
+  socketTimeout: 10000,      // ソケットタイムアウト: 10秒
+  logger: true, // デバッグログ有効化
+  debug: true   // デバッグモード有効化
 });
 
 /**
