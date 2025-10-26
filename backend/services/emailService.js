@@ -1,12 +1,14 @@
 const nodemailer = require('nodemailer');
 const EmailProxy = require('../models/EmailProxy');
 
-// メール送信設定（Gmailを使用する場合の例）
+// メール送信設定（Xserver SMTP）
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.SMTP_HOST || 'sv14354.xserver.jp',
+  port: process.env.SMTP_PORT || 587,
+  secure: false, // STARTTLS を使用
   auth: {
-    user: process.env.EMAIL_USER, // 例: your-email@gmail.com
-    pass: process.env.EMAIL_PASSWORD // Gmailアプリパスワード
+    user: process.env.EMAIL_USER, // 例: info@office-tree.jp
+    pass: process.env.EMAIL_PASSWORD // メールパスワード
   }
 });
 

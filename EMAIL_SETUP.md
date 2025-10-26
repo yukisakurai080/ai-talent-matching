@@ -13,27 +13,16 @@ ZinAIでは、ユーザーが新規登録する際に、登録確認メールが
 
 ## 🔧 本番環境でのメール設定手順
 
-### 1. Gmailアプリパスワードの取得
+### 1. Xserver SMTP設定
 
-本番環境でメール送信機能を有効にするには、Gmailアプリパスワードが必要です。
+本システムは **Xserver** の SMTP を使用して、独自ドメイン `@office-tree.jp` からメールを送信します。
 
-#### 手順：
+#### 必要な情報：
 
-1. **Googleアカウントにアクセス**
-   - https://myaccount.google.com/ にアクセス
-
-2. **2段階認証を有効化**（まだの場合）
-   - 「セキュリティ」→「2段階認証プロセス」→設定
-
-3. **アプリパスワードを生成**
-   - 「セキュリティ」→「Googleへのログイン」→「アプリパスワード」
-   - アプリを選択：「メール」
-   - デバイスを選択：「その他（カスタム名）」→「ZinAI」と入力
-   - 「生成」をクリック
-   - 16文字のパスワードが表示されます（スペースなし）
-
-4. **パスワードをコピー**
-   - このパスワードは後で確認できないため、安全な場所に保存してください
+- **SMTPホスト**: `sv14354.xserver.jp`
+- **SMTPポート**: `587` (STARTTLS)
+- **ユーザー名**: `info@office-tree.jp` (または他の @office-tree.jp のメールアドレス)
+- **パスワード**: メールアカウントのパスワード
 
 ### 2. 環境変数の設定
 
@@ -42,9 +31,11 @@ ZinAIでは、ユーザーが新規登録する際に、登録確認メールが
 `backend/.env` ファイルを編集：
 
 ```bash
-# Email Configuration (Gmail)
-EMAIL_USER=あなたのGmailアドレス@gmail.com
-EMAIL_PASSWORD=生成した16文字のアプリパスワード
+# Email Configuration (Xserver SMTP)
+SMTP_HOST=sv14354.xserver.jp
+SMTP_PORT=587
+EMAIL_USER=info@office-tree.jp
+EMAIL_PASSWORD=your-email-password
 ```
 
 #### Render.com（本番環境）の場合
@@ -56,11 +47,13 @@ EMAIL_PASSWORD=生成した16文字のアプリパスワード
 
 | Key | Value |
 |-----|-------|
-| `EMAIL_USER` | あなたのGmailアドレス@gmail.com |
-| `EMAIL_PASSWORD` | 生成した16文字のアプリパスワード |
+| `SMTP_HOST` | sv14354.xserver.jp |
+| `SMTP_PORT` | 587 |
+| `EMAIL_USER` | info@office-tree.jp |
+| `EMAIL_PASSWORD` | test0315 |
 
 5. 「Save Changes」をクリック
-6. サービスが自動的に再デプロイされます
+6. サービスが自動的に再デプロイされます（数分かかります）
 
 ### 3. フロントエンドURLの設定
 
@@ -166,14 +159,19 @@ URL: http://localhost:3000/auth/verify?token=...
 ### メールが届かない場合
 
 1. **迷惑メールフォルダを確認**
-   - Gmailの迷惑メールフォルダをチェック
+   - 受信者の迷惑メールフォルダをチェック
 
 2. **送信元アドレスの確認**
-   - `EMAIL_USER`に設定したGmailアドレスから送信されているか確認
+   - 送信元: `ZinAI人材マッチング <info@office-tree.jp>`
+   - `EMAIL_USER`に設定したメールアドレスから送信されているか確認
 
-3. **Gmailの送信制限**
-   - Gmailには1日あたりの送信制限があります（通常500通/日）
-   - 大量のテストメールを送信した場合、一時的にブロックされる可能性があります
+3. **Xserverの送信制限**
+   - Xserverには1日あたりの送信制限があります
+   - 大量のテストメールを送信した場合、一時的に制限される可能性があります
+
+4. **メールログの確認**
+   - Xserverのサーバーパネルで「メールログ」を確認
+   - 送信エラーが記録されている場合があります
 
 ## 🚀 本番環境への適用
 
@@ -184,41 +182,25 @@ URL: http://localhost:3000/auth/verify?token=...
 
 ## 📚 参考リンク
 
-- [Googleアプリパスワードの生成方法](https://support.google.com/accounts/answer/185833)
+- [Xserver メール設定マニュアル](https://www.xserver.ne.jp/manual/man_mail_setting.php)
 - [Nodemailer公式ドキュメント](https://nodemailer.com/about/)
-- [Gmail SMTP設定](https://support.google.com/a/answer/176600)
+- [Xserver サーバーパネル](https://www.xserver.ne.jp/login_server.php)
 
-## 💡 その他のメール送信オプション
+## 💡 送信元メールアドレスの推奨
 
-Gmailの代わりに以下のサービスも使用できます：
-
-### SendGrid
-
-```javascript
-// backend/services/emailService.js
-const transporter = nodemailer.createTransport({
-  host: 'smtp.sendgrid.net',
-  port: 587,
-  auth: {
-    user: 'apikey',
-    pass: process.env.SENDGRID_API_KEY
-  }
-});
+### 現在の設定
+```
+info@office-tree.jp
 ```
 
-### AWS SES
-
-```javascript
-// backend/services/emailService.js
-const transporter = nodemailer.createTransport({
-  host: 'email-smtp.us-east-1.amazonaws.com',
-  port: 587,
-  auth: {
-    user: process.env.AWS_SES_USER,
-    pass: process.env.AWS_SES_PASSWORD
-  }
-});
+### サービス名決定後の推奨アドレス
 ```
+noreply@office-tree.jp    # 返信不要の自動送信メール用
+support@office-tree.jp    # サポート対応用
+contact@office-tree.jp    # お問い合わせ用
+```
+
+同じドメインなら環境変数の変更だけで簡単に切り替えできます！
 
 ---
 

@@ -6,10 +6,9 @@ import './CompanyLogin.css';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function CompanyLogin() {
-  const [authMode, setAuthMode] = useState('login'); // 'login' or 'register'
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
+  const [isNewUser, setIsNewUser] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -45,33 +44,7 @@ function CompanyLogin() {
     }
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
-    setError('');
-
-    try {
-      const response = await axios.post(`${API_URL}/companies/login`, {
-        email,
-        password
-      });
-
-      if (response.data.token) {
-        localStorage.setItem('companyToken', response.data.token);
-        setMessage('ログイン成功！リダイレクトしています...');
-        setTimeout(() => {
-          navigate('/');
-        }, 1000);
-      }
-    } catch (err) {
-      setError(err.response?.data?.error || 'ログインに失敗しました');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRegister = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
@@ -80,11 +53,11 @@ function CompanyLogin() {
     try {
       const response = await axios.post(`${API_URL}/auth/request-login`, {
         email,
-        name,
+        name: isNewUser ? name : undefined,
         userType: 'company'
       });
 
-      setMessage(response.data.message || '登録用のURLをメールアドレスに送信しました。メールをご確認ください。');
+      setMessage(response.data.message || 'ログイン用のURLをメールアドレスに送信しました。メールをご確認ください。');
 
       // 開発環境の場合、マジックリンクを表示
       if (response.data.developmentUrl) {
@@ -101,14 +74,14 @@ function CompanyLogin() {
       setEmail('');
       setName('');
     } catch (err) {
-      setError(err.response?.data?.error || '登録リクエストに失敗しました');
+      setError(err.response?.data?.error || 'ログインリクエストに失敗しました');
     } finally {
       setLoading(false);
     }
   };
 
   const handleTestLogin = async () => {
-    setAuthMode('register');
+    setIsNewUser(true);
     setEmail('test@company.com');
     setName('テスト企業');
 
@@ -121,89 +94,41 @@ function CompanyLogin() {
   return (
     <div className="company-login-container">
       <div className="company-login-box">
-        <h1>企業ポータル</h1>
+        <h1>企業ポータル ログイン</h1>
         <p className="login-description">
-          AI人材マッチングシステム
+          メールアドレスを入力してログインリンクを受け取ってください
         </p>
-
-        {/* タブ切り替え */}
-        <div className="auth-tabs">
-          <button
-            className={`auth-tab ${authMode === 'login' ? 'active' : ''}`}
-            onClick={() => {
-              setAuthMode('login');
-              setMessage('');
-              setError('');
-            }}
-          >
-            ログイン
-          </button>
-          <button
-            className={`auth-tab ${authMode === 'register' ? 'active' : ''}`}
-            onClick={() => {
-              setAuthMode('register');
-              setMessage('');
-              setError('');
-            }}
-          >
-            新規登録
-          </button>
-        </div>
 
         {message && <div className="success-message">{message}</div>}
         {error && <div className="error-message">{error}</div>}
 
-        {/* ログインフォーム */}
-        {authMode === 'login' && (
-          <form onSubmit={handleLogin}>
-            <div className="form-group">
-              <label htmlFor="email">メールアドレスまたはユーザーID</label>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email">メールアドレス</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="company@example.com"
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group checkbox-group">
+            <label>
               <input
-                type="text"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="company@example.com または ユーザーID"
-                required
+                type="checkbox"
+                checked={isNewUser}
+                onChange={(e) => setIsNewUser(e.target.checked)}
                 disabled={loading}
               />
-            </div>
+              新規登録
+            </label>
+          </div>
 
-            <div className="form-group">
-              <label htmlFor="password">パスワード</label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="パスワード"
-                required
-                disabled={loading}
-              />
-            </div>
-
-            <button type="submit" className="login-button" disabled={loading}>
-              {loading ? 'ログイン中...' : 'ログイン'}
-            </button>
-          </form>
-        )}
-
-        {/* 新規登録フォーム */}
-        {authMode === 'register' && (
-          <form onSubmit={handleRegister}>
-            <div className="form-group">
-              <label htmlFor="email">メールアドレス</label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="company@example.com"
-                required
-                disabled={loading}
-              />
-            </div>
-
+          {isNewUser && (
             <div className="form-group">
               <label htmlFor="name">企業名</label>
               <input
@@ -216,16 +141,19 @@ function CompanyLogin() {
                 disabled={loading}
               />
             </div>
+          )}
 
-            <button type="submit" className="login-button" disabled={loading}>
-              {loading ? '送信中...' : '登録用URLを送信'}
-            </button>
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? '送信中...' : isNewUser ? '登録してログインリンクを送信' : 'ログインリンクを送信'}
+          </button>
+        </form>
 
-            <p className="register-note">
-              ご入力いただいたメールアドレスに、アカウント登録用のURLをお送りします。
-            </p>
-          </form>
-        )}
+        <div className="login-footer">
+          <p>初めての方は「新規登録」にチェックを入れてください</p>
+          <p style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
+            ※ログインリンクをメールで送信します。メールをご確認ください。
+          </p>
+        </div>
 
         {process.env.NODE_ENV !== 'production' && (
           <div style={{ marginTop: '20px', padding: '15px', background: '#40414f', borderRadius: '8px' }}>
