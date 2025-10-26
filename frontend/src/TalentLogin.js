@@ -96,7 +96,7 @@ function TalentLogin() {
       <div className="talent-login-box">
         <h1>ジョブリスト ログイン</h1>
         <p className="login-description">
-          メールアドレスを入力してログインリンクを受け取ってください
+          メールアドレスまたはユーザーIDを入力してログインリンクを受け取ってください
         </p>
 
         {message && <div className="success-message">{message}</div>}
@@ -104,13 +104,13 @@ function TalentLogin() {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">メールアドレス</label>
+            <label htmlFor="email">メールアドレスまたはユーザーID</label>
             <input
-              type="email"
+              type="text"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="talent@example.com"
+              placeholder="talent@example.com または ユーザーID"
               required
               disabled={loading}
             />

@@ -3,18 +3,7 @@ const router = express.Router();
 const crypto = require('crypto');
 const User = require('../models/User');
 const LoginToken = require('../models/LoginToken');
-const nodemailer = require('nodemailer');
-
-// メール送信設定（開発環境ではコンソール出力）
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: process.env.SMTP_PORT || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
+const { sendRegistrationEmail } = require('../services/emailService');
 
 // マジックリンクログイン要求
 router.post('/request-login', async (req, res) => {
@@ -61,34 +50,35 @@ router.post('/request-login', async (req, res) => {
     // マジックリンク生成
     const loginUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/verify?token=${token}&type=${userType}`;
 
-    // メール送信
-    const mailOptions = {
-      from: process.env.SMTP_FROM || 'noreply@ai-talent-matching.com',
-      to: email,
-      subject: userType === 'company' ? '企業ポータル ログインリンク' : 'ジョブリスト ログインリンク',
-      html: `
-        <h2>${userType === 'company' ? '企業ポータル' : 'ジョブリスト'}へのログイン</h2>
-        <p>以下のリンクをクリックしてログインしてください（15分間有効）：</p>
-        <p><a href="${loginUrl}">${loginUrl}</a></p>
-        <p>このメールに心当たりがない場合は、無視してください。</p>
-      `
-    };
-
     // 開発環境ではコンソールにログイン情報を出力
-    if (process.env.NODE_ENV === 'development' || !process.env.SMTP_USER) {
+    if (process.env.NODE_ENV === 'development' || !process.env.EMAIL_USER) {
       console.log('==============================================');
       console.log('マジックリンク（開発環境）:');
-      console.log(loginUrl);
+      console.log(`名前: ${name}`);
+      console.log(`メール: ${email}`);
+      console.log(`タイプ: ${userType}`);
+      console.log(`URL: ${loginUrl}`);
       console.log('==============================================');
       res.json({
         message: 'ログインリンクをコンソールに出力しました',
         developmentUrl: loginUrl
       });
     } else {
-      await transporter.sendMail(mailOptions);
-      res.json({
-        message: 'ログインリンクをメールで送信しました'
+      // 本番環境ではメール送信
+      const emailResult = await sendRegistrationEmail({
+        email,
+        name,
+        userType,
+        loginUrl
       });
+
+      if (emailResult.success) {
+        res.json({
+          message: 'ログインリンクをメールで送信しました'
+        });
+      } else {
+        throw new Error('メール送信に失敗しました: ' + emailResult.error);
+      }
     }
   } catch (error) {
     console.error('Login request error:', error);

@@ -76,6 +76,72 @@
   background: #059669;
 }
 
+/* 認証タブ */
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #6b7280;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  bottom: -2px;
+}
+
+.auth-tab:hover {
+  color: #10b981;
+}
+
+.auth-tab.active {
+  color: #10b981;
+  border-bottom-color: #10b981;
+  font-weight: 600;
+}
+
+/* 登録メッセージ */
+.register-message {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-top: 15px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.register-message.success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+.register-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* 登録時の注意書き */
+.register-note {
+  margin-top: 15px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+  text-align: left;
+}
+
 /* パートナーポータル */
 .partner-portal {
   min-height: 100vh;
@@ -147,6 +213,20 @@
 .tab-button.active {
   color: #10b981;
   border-bottom-color: #10b981;
+}
+
+.tab-badge {
+  display: inline-block;
+  margin-left: 8px;
+  background: #ef4444;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  min-width: 20px;
+  text-align: center;
 }
 
 /* コンテンツエリア */
@@ -717,6 +797,28 @@
   font-size: 18px;
 }
 
+/* パートナーポータル専用の人材カードスタイル */
+.partner-talent-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.partner-talent-card:hover {
+  background: white;
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+}
+
+.partner-talent-card h3 {
+  margin: 0 0 15px 0;
+  color: #1f2937;
+  font-size: 18px;
+}
+
 .talent-info p {
   margin: 8px 0;
   font-size: 14px;
@@ -1224,4 +1326,574 @@
   .qr-code-card {
     page-break-inside: avoid;
   }
+}
+
+/* 個別成約料設定 */
+.add-individual-fee {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+}
+
+.talent-select {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1f2937;
+  background: white;
+  cursor: pointer;
+}
+
+.talent-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.add-talent-btn {
+  padding: 10px 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.add-talent-btn:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.add-talent-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.individual-fee-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.individual-fee-item {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  display: grid;
+  grid-template-columns: 2fr 2fr 2fr auto;
+  gap: 16px;
+  align-items: center;
+}
+
+.talent-info-brief {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.talent-name {
+  font-weight: 600;
+  font-size: 16px;
+  color: #1f2937;
+}
+
+.fee-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.applied-fee-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fee-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.fee-label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.fee-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.fee-row.partner-receive .fee-value {
+  color: #10b981;
+}
+
+.remove-individual-fee {
+  padding: 8px 16px;
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.remove-individual-fee:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.no-individual-fees {
+  text-align: center;
+  padding: 40px 20px;
+  color: #9ca3af;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+  margin-top: 20px;
+}
+
+.no-individual-fees p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* パートナーポータル - メッセージチェックタブ - シンプルモダン */
+.partner-messages-tab {
+  padding: 40px;
+  background: white;
+  min-height: 600px;
+}
+
+.partner-messages-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.partner-messages-header h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.partner-messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.partner-message-item {
+  background: white;
+  padding: 20px 24px;
+  display: flex;
+  gap: 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.partner-message-item:hover {
+  background: #f9fafb;
+}
+
+.partner-message-item.unread {
+  background: #fafffe;
+}
+
+.partner-message-item.unread .partner-message-talent-name {
+  font-weight: 600;
+}
+
+.partner-message-left {
+  flex-shrink: 0;
+}
+
+.partner-message-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.partner-message-item.unread .partner-message-avatar {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.partner-message-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.partner-message-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.partner-message-info {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.partner-message-talent-name {
+  color: #111827;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.partner-message-company-name {
+  color: #6b7280;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.partner-message-company-name::before {
+  content: '•';
+  margin-right: 6px;
+}
+
+.partner-message-time {
+  color: #9ca3af;
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.partner-message-text {
+  margin: 0;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.partner-no-messages {
+  text-align: center;
+  padding: 100px 20px;
+  color: #9ca3af;
+}
+
+.partner-no-messages p {
+  margin: 0;
+  font-size: 15px;
+}
+
+/* パートナーポータル専用フォームラベル */
+.partner-form-label {
+  color: #1f2937 !important;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+/* パートナーポータル - メッセージ詳細モーダル */
+.partner-message-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.partner-message-modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.partner-message-modal-header {
+  padding: 24px 28px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.partner-message-modal-header h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.partner-message-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.partner-message-modal-close:hover {
+  color: #111827;
+}
+
+.partner-message-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+  background: #f9fafb;
+}
+
+.partner-message-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.partner-message-bubble {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  word-wrap: break-word;
+}
+
+.partner-message-bubble.talent {
+  align-self: flex-start;
+  background: white;
+  border: 1px solid #e5e7eb;
+}
+
+.partner-message-bubble.company {
+  align-self: flex-end;
+  background: #3b82f6;
+  color: white;
+}
+
+.partner-message-bubble-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.partner-message-bubble-sender {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.partner-message-bubble.talent .partner-message-bubble-sender {
+  color: #111827;
+}
+
+.partner-message-bubble.company .partner-message-bubble-sender {
+  color: white;
+}
+
+.partner-message-bubble-time {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.partner-message-bubble.talent .partner-message-bubble-time {
+  color: #9ca3af;
+}
+
+.partner-message-bubble.company .partner-message-bubble-time {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.partner-message-bubble-text {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.partner-message-bubble.talent .partner-message-bubble-text {
+  color: #374151;
+}
+
+.partner-message-bubble.company .partner-message-bubble-text {
+  color: white;
+}
+
+.partner-no-message-thread {
+  text-align: center;
+  padding: 60px 20px;
+  color: #9ca3af;
+}
+
+.partner-no-message-thread p {
+  margin: 0;
+  font-size: 15px;
+}
+
+.partner-message-modal-footer {
+  padding: 16px 28px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  background: white;
+}
+
+.partner-message-modal-close-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.partner-message-modal-close-btn:hover {
+  background: #e5e7eb;
+}
+
+/* パートナーポータル - 企業リスト */
+.partner-company-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.partner-company-item {
+  background: white;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.partner-company-item:hover {
+  background: #f9fafb;
+}
+
+.partner-company-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.partner-company-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 6px;
+}
+
+.partner-company-meta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.partner-message-count-badge {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.partner-unread-badge {
+  background: #10b981;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.partner-company-last-time {
+  color: #9ca3af;
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+/* パートナーポータル - 戻るボタン */
+.partner-message-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.partner-message-back-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.partner-message-back-btn:hover {
+  background: #e5e7eb;
+}
+
+.partner-message-header-left h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

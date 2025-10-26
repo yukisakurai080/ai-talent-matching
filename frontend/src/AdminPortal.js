@@ -243,13 +243,13 @@ function AdminPortal() {
             )}
 
             <div className="form-group">
-              <label>メールアドレス</label>
+              <label>メールアドレスまたはユーザーID</label>
               <input
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="admin@example.com"
+                placeholder="admin@example.com または ユーザーID"
               />
             </div>
 

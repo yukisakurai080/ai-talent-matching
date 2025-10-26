@@ -4,9 +4,9 @@ import './PartnerPortal.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-function PartnerPortal() {
+function PartnerPortal({ isDemo = false }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [token, setToken] = useState(localStorage.getItem('partnerToken') || '');
+  const [token, setToken] = useState(isDemo ? 'demo-token' : (localStorage.getItem('partnerToken') || ''));
   const [partner, setPartner] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
 
@@ -18,11 +18,20 @@ function PartnerPortal() {
     { months: 6, refundRate: 0, description: '6ヶ月以降は返金なし' }
   ]);
 
+  // ログイン/新規登録の切り替え
+  const [authMode, setAuthMode] = useState('login'); // 'login' or 'register'
+
   // ログインフォーム
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: ''
   });
+
+  // 新規登録フォーム
+  const [registerForm, setRegisterForm] = useState({
+    email: ''
+  });
+  const [registerMessage, setRegisterMessage] = useState('');
 
   // 登録済み人材リスト
   const [talents, setTalents] = useState([]);
@@ -44,13 +53,212 @@ function PartnerPortal() {
   // 分析データ
   const [analytics, setAnalytics] = useState(null);
 
+  // 個別成約料設定
+  const [individualFees, setIndividualFees] = useState({});
+  const [selectedTalentForFee, setSelectedTalentForFee] = useState('');
+
+  // メッセージデータ
+  const [messages, setMessages] = useState([]);
+
+  // メッセージモーダル
+  const [showCompanyListModal, setShowCompanyListModal] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [selectedTalentId, setSelectedTalentId] = useState(null);
+  const [selectedCompanyId, setSelectedCompanyId] = useState(null);
+  const [messageDetails, setMessageDetails] = useState({}); // 人材ID → 企業ID → メッセージ配列
+
   useEffect(() => {
+    // デモモードの場合はダミーデータを設定
+    if (isDemo) {
+      setPartner({
+        _id: 'demo-partner',
+        name: 'デモ人材紹介会社',
+        email: 'demo@partner.com',
+        placementFee: 50000,
+        organizationType: 'sending_organization',
+        registeredTalentsCount: 2,
+        guaranteePeriods: [
+          { months: 1, refundRate: 100, description: '1ヶ月以内の退職は全額返金' },
+          { months: 3, refundRate: 50, description: '3ヶ月以内の退職は50%返金' },
+          { months: 6, refundRate: 0, description: '6ヶ月以降は返金なし' }
+        ]
+      });
+      setPlacementFee(50000);
+      setTalents([
+        {
+          _id: 'demo-talent-1',
+          name: '田中 一郎',
+          nationality: '日本',
+          skills: ['React', 'Node.js'],
+          experience: '3年',
+          status: 'active',
+          registeredAt: new Date().toISOString()
+        },
+        {
+          _id: 'demo-talent-2',
+          name: 'リー・ウェイ',
+          nationality: '中国',
+          skills: ['Python', 'Django'],
+          experience: '5年',
+          status: 'active',
+          registeredAt: new Date().toISOString()
+        }
+      ]);
+      setAnalytics({
+        summary: {
+          totalRecommendations: 128,
+          talentsWithRecommendations: 35,
+          totalTalents: 45,
+          totalViews: 89,
+          talentsWithViews: 28,
+          totalMessages: 42,
+          talentsWithMessages: 18,
+          totalInterviews: 15,
+          talentsWithInterviews: 12
+        },
+        conversionRates: {
+          recommendationRate: 77.8,
+          viewRate: 62.2,
+          messageRate: 40.0,
+          interviewRate: 26.7
+        },
+        funnelRates: {
+          viewFromRecommendationRate: 80.0,
+          messageFromViewRate: 64.3,
+          interviewFromMessageRate: 66.7
+        },
+        talentDetails: [
+          { id: '1', name: '田中 一郎', industry: 'IT', aiRecommendations: 8, profileViews: 5, messagesReceived: 3, interviewRequests: 2, engagementScore: 85 },
+          { id: '2', name: 'リー・ウェイ', industry: 'IT', aiRecommendations: 6, profileViews: 4, messagesReceived: 2, interviewRequests: 1, engagementScore: 78 },
+          { id: '3', name: '佐藤 花子', industry: '製造', aiRecommendations: 5, profileViews: 3, messagesReceived: 2, interviewRequests: 1, engagementScore: 72 },
+          { id: '4', name: 'ジョン・スミス', industry: 'IT', aiRecommendations: 7, profileViews: 6, messagesReceived: 4, interviewRequests: 3, engagementScore: 92 },
+          { id: '5', name: '鈴木 太郎', industry: '建設', aiRecommendations: 4, profileViews: 2, messagesReceived: 1, interviewRequests: 0, engagementScore: 65 }
+        ]
+      });
+
+      // メッセージデモデータ
+      setMessages([
+        {
+          _id: 'msg1',
+          talentId: 'demo-talent-1',
+          talentName: '田中 一郎',
+          companyName: 'ABC株式会社',
+          lastMessage: '面接日程についてご相談させていただけますでしょうか。',
+          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          unread: true
+        },
+        {
+          _id: 'msg2',
+          talentId: 'demo-talent-2',
+          talentName: 'リー・ウェイ',
+          companyName: 'XYZ商事',
+          lastMessage: 'ご紹介ありがとうございます。詳細を確認させていただきました。',
+          timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+          unread: false
+        }
+      ]);
+
+      // 詳細メッセージやり取りデモデータ（人材ID → 企業ID → メッセージ配列）
+      setMessageDetails({
+        'demo-talent-1': {
+          'company-abc': {
+            companyName: 'ABC株式会社',
+            messages: [
+              {
+                _id: 'msg1-1',
+                sender: 'ABC株式会社',
+                senderType: 'company',
+                message: '田中様のプロフィールを拝見しました。弊社の開発職にご興味はございますか？',
+                timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
+              },
+              {
+                _id: 'msg1-2',
+                sender: '田中 一郎',
+                senderType: 'talent',
+                message: 'はい、ぜひ詳細をお伺いしたいです。',
+                timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+              },
+              {
+                _id: 'msg1-3',
+                sender: 'ABC株式会社',
+                senderType: 'company',
+                message: 'ありがとうございます。来週の火曜日14時から面接のお時間をいただけますでしょうか？',
+                timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
+              },
+              {
+                _id: 'msg1-4',
+                sender: '田中 一郎',
+                senderType: 'talent',
+                message: '面接日程についてご相談させていただけますでしょうか。',
+                timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+              }
+            ],
+            lastMessageTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+            unreadCount: 1
+          },
+          'company-def': {
+            companyName: 'DEF技研',
+            messages: [
+              {
+                _id: 'msg1-5',
+                sender: 'DEF技研',
+                senderType: 'company',
+                message: '田中様、当社のエンジニアポジションにご興味はありませんか？',
+                timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()
+              },
+              {
+                _id: 'msg1-6',
+                sender: '田中 一郎',
+                senderType: 'talent',
+                message: '興味があります。詳細を教えていただけますか？',
+                timestamp: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString()
+              }
+            ],
+            lastMessageTime: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(),
+            unreadCount: 0
+          }
+        },
+        'demo-talent-2': {
+          'company-xyz': {
+            companyName: 'XYZ商事',
+            messages: [
+              {
+                _id: 'msg2-1',
+                sender: 'XYZ商事',
+                senderType: 'company',
+                message: 'リー様のご経歴を拝見しました。営業職のポジションをご紹介させていただきたいと思います。',
+                timestamp: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString()
+              },
+              {
+                _id: 'msg2-2',
+                sender: 'リー・ウェイ',
+                senderType: 'talent',
+                message: 'ご紹介ありがとうございます。詳細を確認させていただきました。',
+                timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+              }
+            ],
+            lastMessageTime: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+            unreadCount: 0
+          }
+        }
+      });
+
+      // 個別成約料デモデータ
+      setIndividualFees({
+        'demo-talent-1': 60000
+      });
+
+      setIsLoggedIn(true);
+      return;
+    }
+
     if (token) {
       fetchPartnerInfo();
       fetchTalents();
       fetchAnalytics();
+      fetchMessages();
     }
-  }, [token]);
+  }, [token, isDemo]);
 
   const fetchPartnerInfo = async () => {
     try {
@@ -61,6 +269,9 @@ function PartnerPortal() {
       setPlacementFee(response.data.placementFee || 0);
       if (response.data.guaranteePeriods && response.data.guaranteePeriods.length > 0) {
         setGuaranteePeriods(response.data.guaranteePeriods);
+      }
+      if (response.data.individualFees) {
+        setIndividualFees(response.data.individualFees);
       }
       setIsLoggedIn(true);
     } catch (error) {
@@ -91,6 +302,31 @@ function PartnerPortal() {
     }
   };
 
+  const fetchMessages = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/partners/messages`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMessages(response.data.messages || []);
+    } catch (error) {
+      console.error('Messages fetch error:', error);
+    }
+  };
+
+  const fetchMessageDetails = async (talentId) => {
+    try {
+      const response = await axios.get(`${API_URL}/partners/messages/${talentId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMessageDetails(prev => ({
+        ...prev,
+        [talentId]: response.data.companies || {}
+      }));
+    } catch (error) {
+      console.error('Message details fetch error:', error);
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -107,6 +343,18 @@ function PartnerPortal() {
     }
   };
 
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(`${API_URL}/partners/register`, registerForm);
+      setRegisterMessage('登録用のURLをメールアドレスに送信しました。メールをご確認ください。');
+      setRegisterForm({ email: '' });
+    } catch (error) {
+      console.error('Register error:', error);
+      setRegisterMessage(error.response?.data?.error || '登録に失敗しました');
+    }
+  };
+
   const handleLogout = () => {
     setToken('');
     setIsLoggedIn(false);
@@ -116,15 +364,16 @@ function PartnerPortal() {
 
   const handleSaveFeeSettings = async () => {
     try {
-      console.log('保存データ:', { placementFee, guaranteePeriods });
+      console.log('保存データ:', { placementFee, guaranteePeriods, individualFees });
       const response = await axios.put(`${API_URL}/partners/fee-settings`, {
         placementFee,
-        guaranteePeriods
+        guaranteePeriods,
+        individualFees
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('保存レスポンス:', response.data);
-      alert('成約料・保証期間設定を保存しました');
+      alert('成約料・保証規定を保存しました');
       await fetchPartnerInfo();
     } catch (error) {
       console.error('Save fee settings error:', error);
@@ -405,6 +654,25 @@ function PartnerPortal() {
   // QRコード生成
   const handleGenerateQR = async (e) => {
     e.preventDefault();
+
+    // デモモードの場合はダミーQRコードを生成
+    if (isDemo) {
+      const demoQRCodes = [];
+      const talentDemoUrl = 'https://office-tree.jp/ZinAI/talent/demo';
+      for (let i = 0; i < qrForm.count; i++) {
+        demoQRCodes.push({
+          studentName: qrForm.studentName || `デモ学生 ${generatedQRCodes.length + i + 1}`,
+          qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(talentDemoUrl)}`,
+          partnerCode: 'DEMO-QR-' + Math.random().toString(36).substring(7).toUpperCase(),
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        });
+      }
+      setGeneratedQRCodes([...generatedQRCodes, ...demoQRCodes]);
+      alert(`QRコードを${demoQRCodes.length}個生成しました（デモモード）`);
+      setQrForm({ studentName: '', count: 1 });
+      return;
+    }
+
     try {
       const response = await axios.post(
         `${API_URL}/partners/generate-qr`,
@@ -461,31 +729,87 @@ function PartnerPortal() {
           <h1>パートナーポータル</h1>
           <p className="login-subtitle">日本語学校・送り出し機関専用</p>
 
-          <form onSubmit={handleLogin} className="partner-login-form">
-            <div className="form-group">
-              <label>メールアドレス</label>
-              <input
-                type="email"
-                value={loginForm.email}
-                onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>パスワード</label>
-              <input
-                type="password"
-                value={loginForm.password}
-                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                required
-              />
-            </div>
-
-            <button type="submit" className="partner-login-button">
+          {/* タブ切り替え */}
+          <div className="auth-tabs">
+            <button
+              className={`auth-tab ${authMode === 'login' ? 'active' : ''}`}
+              onClick={() => {
+                setAuthMode('login');
+                setRegisterMessage('');
+              }}
+            >
               ログイン
             </button>
-          </form>
+            <button
+              className={`auth-tab ${authMode === 'register' ? 'active' : ''}`}
+              onClick={() => {
+                setAuthMode('register');
+                setRegisterMessage('');
+              }}
+            >
+              新規登録
+            </button>
+          </div>
+
+          {/* ログインフォーム */}
+          {authMode === 'login' && (
+            <form onSubmit={handleLogin} className="partner-login-form">
+              <div className="form-group">
+                <label>メールアドレスまたはユーザーID</label>
+                <input
+                  type="text"
+                  value={loginForm.email}
+                  onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                  required
+                  placeholder="email@example.com または ユーザーID"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>パスワード</label>
+                <input
+                  type="password"
+                  value={loginForm.password}
+                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                  required
+                />
+              </div>
+
+              <button type="submit" className="partner-login-button">
+                ログイン
+              </button>
+            </form>
+          )}
+
+          {/* 新規登録フォーム */}
+          {authMode === 'register' && (
+            <form onSubmit={handleRegister} className="partner-login-form">
+              <div className="form-group">
+                <label>メールアドレス</label>
+                <input
+                  type="email"
+                  value={registerForm.email}
+                  onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
+                  required
+                  placeholder="example@company.com"
+                />
+              </div>
+
+              <button type="submit" className="partner-login-button">
+                登録用URLを送信
+              </button>
+
+              {registerMessage && (
+                <div className={`register-message ${registerMessage.includes('送信しました') ? 'success' : 'error'}`}>
+                  {registerMessage}
+                </div>
+              )}
+
+              <p className="register-note">
+                ご入力いただいたメールアドレスに、アカウント登録用のURLをお送りします。
+              </p>
+            </form>
+          )}
         </div>
       </div>
     );
@@ -529,10 +853,19 @@ function PartnerPortal() {
           登録済み人材
         </button>
         <button
+          className={`tab-button ${activeTab === 'messages' ? 'active' : ''}`}
+          onClick={() => setActiveTab('messages')}
+        >
+          メッセージチェック
+          {messages.filter(m => m.unread).length > 0 && (
+            <span className="tab-badge">{messages.filter(m => m.unread).length}</span>
+          )}
+        </button>
+        <button
           className={`tab-button ${activeTab === 'fee-settings' ? 'active' : ''}`}
           onClick={() => setActiveTab('fee-settings')}
         >
-          成約料・保証期間設定
+          成約料・保証規定
         </button>
       </div>
 
@@ -542,21 +875,18 @@ function PartnerPortal() {
             <h2>統計情報</h2>
             <div className="stats-cards">
               <div className="stat-card" style={{ background: 'white' }}>
-                <h3>登録人材数</h3>
-                <p className="stat-number" style={{ color: '#10b981' }}>{partner?.registeredTalentsCount || 0}</p>
-              </div>
-              <div className="stat-card" style={{ background: 'white' }}>
-                <h3>パートナーコード</h3>
-                <p className="stat-code">{partner?.partnerCode}</p>
-              </div>
-              <div className="stat-card" style={{ background: 'white' }}>
                 <h3>機関種別</h3>
                 <p className="stat-text">
                   {partner?.organizationType === 'language_school' && '日本語学校'}
                   {partner?.organizationType === 'training_center' && '研修センター'}
-                  {partner?.organizationType === 'recruitment_agency' && '送り出し機関'}
+                  {partner?.organizationType === 'recruitment_agency' && '人材紹介会社'}
+                  {partner?.organizationType === 'sending_organization' && '送り出し機関'}
                   {partner?.organizationType === 'other' && 'その他'}
                 </p>
+              </div>
+              <div className="stat-card" style={{ background: 'white' }}>
+                <h3>登録人材数</h3>
+                <p className="stat-number" style={{ color: '#10b981' }}>{partner?.registeredTalentsCount || 0}</p>
               </div>
               <div className="stat-card" style={{ background: 'white' }}>
                 <h3>成約料</h3>
@@ -569,12 +899,6 @@ function PartnerPortal() {
                 </p>
                 <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
                   (システム手数料15%控除後)
-                </p>
-              </div>
-              <div className="stat-card" style={{ background: 'white' }}>
-                <h3>保証期間設定</h3>
-                <p className="stat-text" style={{ color: '#10b981' }}>
-                  {partner?.guaranteePeriods?.length || 0}件
                 </p>
               </div>
             </div>
@@ -842,7 +1166,7 @@ function PartnerPortal() {
 
             <form onSubmit={handleGenerateQR} className="qr-form">
               <div className="form-group">
-                <label>学生名（任意）</label>
+                <label className="partner-form-label">学生名（任意）</label>
                 <input
                   type="text"
                   value={qrForm.studentName}
@@ -852,7 +1176,7 @@ function PartnerPortal() {
               </div>
 
               <div className="form-group">
-                <label>生成数</label>
+                <label className="partner-form-label">生成数</label>
                 <input
                   type="number"
                   min="1"
@@ -922,7 +1246,7 @@ function PartnerPortal() {
                   );
                 })
                 .map((talent) => (
-                  <div key={talent._id} className="talent-card" onClick={() => setSelectedTalent(talent)}>
+                  <div key={talent._id} className="partner-talent-card" onClick={() => setSelectedTalent(talent)}>
                     <h3>{talent.name}</h3>
                     <div className="talent-info">
                       <p><strong>年齢:</strong> {talent.age}歳</p>
@@ -1090,16 +1414,16 @@ function PartnerPortal() {
           </div>
         )}
 
-        {/* 成約料・保証期間設定タブ */}
+        {/* 成約料・保証規定タブ */}
         {activeTab === 'fee-settings' && (
           <div className="fee-settings-tab">
-            <h2>成約料・保証期間設定</h2>
+            <h2>成約料・保証規定</h2>
 
-            {/* 成約料設定 */}
+            {/* 一律成約料設定 */}
             <div className="fee-settings-section">
-              <h3>成約料設定</h3>
+              <h3>一律成約料設定</h3>
               <div className="form-group">
-                <label>成約料（円）</label>
+                <label className="partner-form-label">成約料（円）</label>
                 <input
                   type="number"
                   value={placementFee}
@@ -1126,9 +1450,107 @@ function PartnerPortal() {
               </div>
             </div>
 
-            {/* 保証期間設定 */}
+            {/* 個別成約料設定 */}
             <div className="fee-settings-section">
-              <h3>保証期間設定</h3>
+              <h3>個別成約料設定</h3>
+              <p className="section-description">
+                特定の人材に対して個別の成約料を設定できます。個別設定は全体設定より優先して適用されます。
+              </p>
+
+              {/* 人材追加UI */}
+              <div className="add-individual-fee">
+                <select
+                  value={selectedTalentForFee}
+                  onChange={(e) => setSelectedTalentForFee(e.target.value)}
+                  className="talent-select"
+                >
+                  <option value="">人材を選択...</option>
+                  {talents
+                    .filter(t => !individualFees[t._id])
+                    .map((talent) => (
+                      <option key={talent._id} value={talent._id}>
+                        {talent.name}
+                      </option>
+                    ))}
+                </select>
+                <button
+                  className="add-talent-btn"
+                  disabled={!selectedTalentForFee}
+                  onClick={() => {
+                    if (selectedTalentForFee) {
+                      setIndividualFees({
+                        ...individualFees,
+                        [selectedTalentForFee]: placementFee
+                      });
+                      setSelectedTalentForFee('');
+                    }
+                  }}
+                >
+                  + 追加
+                </button>
+              </div>
+
+              {/* 設定済み個別成約料リスト */}
+              {Object.keys(individualFees).length > 0 ? (
+                <div className="individual-fee-list">
+                  {Object.entries(individualFees).map(([talentId, fee]) => {
+                    const talent = talents.find(t => t._id === talentId);
+                    if (!talent) return null;
+
+                    const appliedFee = fee || placementFee;
+                    const partnerReceives = Math.floor(appliedFee * 0.85);
+
+                    return (
+                      <div key={talentId} className="individual-fee-item">
+                        <div className="talent-info-brief">
+                          <span className="talent-name">{talent.name}</span>
+                        </div>
+                        <div className="fee-input-group">
+                          <input
+                            type="number"
+                            className="form-input small"
+                            placeholder={`基本: ¥${placementFee.toLocaleString()}`}
+                            value={fee || ''}
+                            onChange={(e) => setIndividualFees({
+                              ...individualFees,
+                              [talentId]: e.target.value ? Number(e.target.value) : placementFee
+                            })}
+                          />
+                        </div>
+                        <div className="applied-fee-info">
+                          <div className="fee-row">
+                            <span className="fee-label">適用額:</span>
+                            <span className="fee-value">¥{appliedFee.toLocaleString()}</span>
+                          </div>
+                          <div className="fee-row partner-receive">
+                            <span className="fee-label">パートナー受取額:</span>
+                            <span className="fee-value">¥{partnerReceives.toLocaleString()}</span>
+                          </div>
+                        </div>
+                        <button
+                          className="remove-individual-fee"
+                          onClick={() => {
+                            const newFees = { ...individualFees };
+                            delete newFees[talentId];
+                            setIndividualFees(newFees);
+                          }}
+                        >
+                          削除
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="no-individual-fees">
+                  <p>個別成約料が設定されている人材はありません</p>
+                </div>
+              )}
+            </div>
+
+            {/* 保証に関する規定 */}
+            <div className="fee-settings-section">
+              <h3>保証に関する規定</h3>
               <p className="section-description">
                 退職時の返金ルールを設定します。採用後の早期退職に対する返金率を定義できます。
               </p>
@@ -1148,7 +1570,7 @@ function PartnerPortal() {
 
                   <div className="guarantee-period-inputs">
                     <div className="form-group">
-                      <label>期間（ヶ月）</label>
+                      <label className="partner-form-label">期間（ヶ月）</label>
                       <input
                         type="number"
                         value={period.months}
@@ -1159,7 +1581,7 @@ function PartnerPortal() {
                     </div>
 
                     <div className="form-group">
-                      <label>返金率（%）</label>
+                      <label className="partner-form-label">返金率（%）</label>
                       <input
                         type="number"
                         value={period.refundRate}
@@ -1171,7 +1593,7 @@ function PartnerPortal() {
                     </div>
 
                     <div className="form-group" style={{ flex: 2 }}>
-                      <label>説明</label>
+                      <label className="partner-form-label">説明</label>
                       <input
                         type="text"
                         value={period.description}
@@ -1202,7 +1624,212 @@ function PartnerPortal() {
             </div>
           </div>
         )}
+
+        {/* メッセージチェックタブ */}
+        {activeTab === 'messages' && (
+          <div className="partner-messages-tab">
+            <div className="partner-messages-header">
+              <h2>メッセージ</h2>
+            </div>
+
+            {messages.length === 0 ? (
+              <div className="partner-no-messages">
+                <p>メッセージはありません</p>
+              </div>
+            ) : (
+              <div className="partner-messages-list">
+                {messages.map((message) => (
+                  <div
+                    key={message._id}
+                    className={`partner-message-item ${message.unread ? 'unread' : ''}`}
+                    onClick={() => {
+                      setSelectedTalentId(message.talentId);
+                      if (!isDemo && !messageDetails[message.talentId]) {
+                        fetchMessageDetails(message.talentId);
+                      }
+                      setShowCompanyListModal(true);
+                    }}
+                  >
+                    <div className="partner-message-left">
+                      <div className="partner-message-avatar">
+                        {message.talentName.substring(0, 2)}
+                      </div>
+                    </div>
+                    <div className="partner-message-body">
+                      <div className="partner-message-top">
+                        <div className="partner-message-info">
+                          <span className="partner-message-talent-name">{message.talentName}</span>
+                          <span className="partner-message-company-name">{message.companyName}</span>
+                        </div>
+                        <span className="partner-message-time">
+                          {new Date(message.timestamp).toLocaleString('ja-JP', {
+                            month: 'numeric',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                      <p className="partner-message-text">{message.lastMessage}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* 企業リストモーダル */}
+      {showCompanyListModal && selectedTalentId && (
+        <div className="partner-message-modal-overlay" onClick={() => setShowCompanyListModal(false)}>
+          <div className="partner-message-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="partner-message-modal-header">
+              <h3>
+                {messages.find(m => m.talentId === selectedTalentId)?.talentName} - やり取りしている企業
+              </h3>
+              <button
+                className="partner-message-modal-close"
+                onClick={() => setShowCompanyListModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="partner-message-modal-body">
+              {messageDetails[selectedTalentId] && Object.keys(messageDetails[selectedTalentId]).length > 0 ? (
+                <div className="partner-company-list">
+                  {Object.entries(messageDetails[selectedTalentId]).map(([companyId, companyData]) => (
+                    <div
+                      key={companyId}
+                      className="partner-company-item"
+                      onClick={() => {
+                        setSelectedCompanyId(companyId);
+                        setShowCompanyListModal(false);
+                        setShowMessageModal(true);
+                      }}
+                    >
+                      <div className="partner-company-info">
+                        <div className="partner-company-name">{companyData.companyName}</div>
+                        <div className="partner-company-meta">
+                          <span className="partner-message-count-badge">
+                            {companyData.messages.length}件のメッセージ
+                          </span>
+                          {companyData.unreadCount > 0 && (
+                            <span className="partner-unread-badge">{companyData.unreadCount}件未読</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="partner-company-last-time">
+                        {new Date(companyData.lastMessageTime).toLocaleString('ja-JP', {
+                          month: 'numeric',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="partner-no-message-thread">
+                  <p>企業とのやり取りがありません</p>
+                </div>
+              )}
+            </div>
+
+            <div className="partner-message-modal-footer">
+              <button
+                className="partner-message-modal-close-btn"
+                onClick={() => setShowCompanyListModal(false)}
+              >
+                閉じる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* メッセージ詳細モーダル */}
+      {showMessageModal && selectedTalentId && selectedCompanyId && (
+        <div className="partner-message-modal-overlay" onClick={() => setShowMessageModal(false)}>
+          <div className="partner-message-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="partner-message-modal-header">
+              <div className="partner-message-header-left">
+                <button
+                  className="partner-message-back-btn"
+                  onClick={() => {
+                    setShowMessageModal(false);
+                    setSelectedCompanyId(null);
+                    setShowCompanyListModal(true);
+                  }}
+                >
+                  ← 戻る
+                </button>
+                <h3>
+                  {messages.find(m => m.talentId === selectedTalentId)?.talentName} × {messageDetails[selectedTalentId]?.[selectedCompanyId]?.companyName}
+                </h3>
+              </div>
+              <button
+                className="partner-message-modal-close"
+                onClick={() => {
+                  setShowMessageModal(false);
+                  setSelectedCompanyId(null);
+                  setSelectedTalentId(null);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="partner-message-modal-body">
+              {messageDetails[selectedTalentId]?.[selectedCompanyId]?.messages &&
+               messageDetails[selectedTalentId][selectedCompanyId].messages.length > 0 ? (
+                <div className="partner-message-thread">
+                  {messageDetails[selectedTalentId][selectedCompanyId].messages.map((msg) => (
+                    <div
+                      key={msg._id}
+                      className={`partner-message-bubble ${msg.senderType === 'talent' ? 'talent' : 'company'}`}
+                    >
+                      <div className="partner-message-bubble-header">
+                        <span className="partner-message-bubble-sender">{msg.sender}</span>
+                        <span className="partner-message-bubble-time">
+                          {new Date(msg.timestamp).toLocaleString('ja-JP', {
+                            month: 'numeric',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                      <div className="partner-message-bubble-text">
+                        {msg.message}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="partner-no-message-thread">
+                  <p>メッセージがありません</p>
+                </div>
+              )}
+            </div>
+
+            <div className="partner-message-modal-footer">
+              <button
+                className="partner-message-modal-close-btn"
+                onClick={() => {
+                  setShowMessageModal(false);
+                  setSelectedCompanyId(null);
+                  setSelectedTalentId(null);
+                }}
+              >
+                閉じる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

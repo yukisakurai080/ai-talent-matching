@@ -21,9 +21,11 @@ function App() {
         <Route path="/talent/login" element={<TalentLogin />} />
         <Route path="/" element={<CompanyApp />} />
         <Route path="/company-app" element={<CompanyApp />} />
+        <Route path="/talent/demo" element={<TalentApp isDemo={true} />} />
         <Route path="/talent/register" element={<TalentApp />} />
         <Route path="/talent/jobs" element={<JobListApp />} />
         <Route path="/partner" element={<PartnerPortal />} />
+        <Route path="/partner/demo" element={<PartnerPortal isDemo={true} />} />
         <Route path="/admin" element={<AdminPortal />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-cancel" element={<PaymentCancel />} />
