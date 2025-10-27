@@ -86,7 +86,7 @@ router.post('/request-login', async (req, res) => {
   }
 });
 
-// トークン検証（パスワード未設定の場合のみ）
+// トークン検証
 router.get('/verify/:token', async (req, res) => {
   try {
     const { token } = req.params;
@@ -113,17 +113,7 @@ router.get('/verify/:token', async (req, res) => {
       return res.status(404).json({ error: 'ユーザーが見つかりません' });
     }
 
-    // パスワードが既に設定されている場合は、ログインページにリダイレクト
-    if (user.isPasswordSet) {
-      return res.json({
-        message: 'アカウントは既に設定済みです。ログインしてください。',
-        redirectToLogin: true,
-        email: user.email,
-        userType: user.userType
-      });
-    }
-
-    // パスワード未設定の場合、トークンとユーザー情報を返す
+    // トークンとユーザー情報を返す（パスワード設定画面へ）
     res.json({
       message: 'トークン検証成功',
       needsPasswordSetup: true,
