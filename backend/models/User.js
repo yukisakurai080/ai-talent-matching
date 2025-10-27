@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -10,6 +11,14 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
+  },
+  password: {
+    type: String,
+    select: false  // デフォルトではクエリ結果に含めない
+  },
+  isPasswordSet: {
+    type: Boolean,
+    default: false
   },
   userType: {
     type: String,
@@ -69,9 +78,29 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-userSchema.pre('save', function(next) {
+userSchema.pre('save', async function(next) {
   this.updatedAt = Date.now();
+
+  // パスワードが変更された場合のみハッシュ化
+  if (this.isModified('password') && this.password) {
+    try {
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+      this.isPasswordSet = true;
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   next();
 });
+
+// パスワード比較メソッド
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  if (!this.password) {
+    return false;
+  }
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 module.exports = mongoose.model('User', userSchema);

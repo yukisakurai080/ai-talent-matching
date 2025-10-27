@@ -7,6 +7,7 @@ import PartnerPortal from './PartnerPortal';
 import AdminPortal from './AdminPortal';
 import CompanyLogin from './CompanyLogin';
 import TalentLogin from './TalentLogin';
+import SetupAccount from './SetupAccount';
 import PaymentSuccess from './PaymentSuccess';
 import PaymentCancel from './PaymentCancel';
 import './App.css';
@@ -17,7 +18,7 @@ function App() {
       <Routes>
         <Route path="/demo" element={<CompanyApp isDemo={true} />} />
         <Route path="/login" element={<CompanyLogin />} />
-        <Route path="/auth/verify" element={<CompanyLogin />} />
+        <Route path="/auth/verify" element={<SetupAccount />} />
         <Route path="/talent/login" element={<TalentLogin />} />
         <Route path="/" element={<CompanyApp />} />
         <Route path="/company-app" element={<CompanyApp />} />

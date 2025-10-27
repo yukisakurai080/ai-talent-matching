@@ -183,87 +183,55 @@ const sendRegistrationEmail = async ({
   try {
     const isCompany = userType === 'company';
     const htmlBody = `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
           <!-- ヘッダー -->
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;">
-              🎉 ZinAI人材マッチング
+          <div style="background: #2563eb; padding: 32px 24px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">
+              ZinAI
             </h1>
-            <p style="color: #f0f0f0; margin: 10px 0 0 0; font-size: 16px;">
-              ${isCompany ? '企業ポータル' : 'ジョブリスト'}へようこそ！
+            <p style="color: #e0e7ff; margin: 8px 0 0 0; font-size: 14px; font-weight: 400;">
+              人材マッチングプラットフォーム
             </p>
           </div>
 
           <!-- メインコンテンツ -->
-          <div style="padding: 40px 30px;">
-            <h2 style="color: #333333; margin: 0 0 20px 0; font-size: 22px;">
-              ${name}様
+          <div style="padding: 40px 32px;">
+            <h2 style="color: #1f2937; margin: 0 0 16px 0; font-size: 20px; font-weight: 600;">
+              ${name} 様
             </h2>
 
-            <p style="color: #555555; line-height: 1.8; margin: 0 0 25px 0; font-size: 16px;">
-              この度は<strong>ZinAI人材マッチングシステム</strong>にご登録いただき、誠にありがとうございます。
+            <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 15px;">
+              ${isCompany ? '企業ポータル' : 'ジョブリスト'}へのご登録ありがとうございます。<br>
+              下記のボタンをクリックして、アカウント設定を完了してください。
             </p>
 
-            <p style="color: #555555; line-height: 1.8; margin: 0 0 30px 0; font-size: 16px;">
-              下記のボタンをクリックして、アカウントの登録を完了してください。<br>
-              <span style="color: #999999; font-size: 14px;">※このリンクは15分間有効です</span>
-            </p>
-
-            <!-- ログインボタン -->
-            <div style="text-align: center; margin: 35px 0;">
+            <!-- 登録ボタン -->
+            <div style="text-align: center; margin: 32px 0;">
               <a href="${loginUrl}"
-                 style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: white; padding: 16px 45px; text-decoration: none; border-radius: 50px;
-                        font-size: 18px; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-                        transition: all 0.3s ease;">
-                ${isCompany ? '🏢 企業ポータルにログイン' : '💼 ジョブリストにログイン'}
+                 style="display: inline-block; background: #2563eb; color: #ffffff;
+                        padding: 14px 32px; text-decoration: none; border-radius: 6px;
+                        font-size: 15px; font-weight: 500;">
+                アカウント設定を完了する
               </a>
             </div>
 
-            <!-- 情報ボックス -->
-            <div style="background: #f8f9fa; padding: 25px; border-radius: 12px; margin: 30px 0; border-left: 4px solid #667eea;">
-              <h3 style="color: #667eea; margin: 0 0 15px 0; font-size: 18px;">
-                💡 ${isCompany ? '企業ポータルでできること' : 'ジョブリストでできること'}
-              </h3>
-              <ul style="color: #555555; line-height: 1.8; margin: 0; padding-left: 20px;">
-                ${isCompany ? `
-                  <li>求人情報の投稿・管理</li>
-                  <li>応募者の確認とメッセージのやり取り</li>
-                  <li>AI による最適な人材マッチング</li>
-                  <li>面接進捗の管理</li>
-                ` : `
-                  <li>最新の求人情報の閲覧</li>
-                  <li>企業への応募とメッセージ送信</li>
-                  <li>AIによる求人のレコメンド</li>
-                  <li>応募状況の確認</li>
-                `}
-              </ul>
-            </div>
-
-            <!-- 注意事項 -->
-            <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #ffc107;">
-              <p style="color: #856404; margin: 0; font-size: 14px; line-height: 1.6;">
-                <strong>⚠️ セキュリティに関する注意</strong><br>
-                このメールに心当たりがない場合は、お手数ですが削除してください。<br>
-                リンクを他の人と共有しないようご注意ください。
-              </p>
-            </div>
+            <p style="color: #6b7280; font-size: 13px; line-height: 1.6; margin: 24px 0 0 0;">
+              このリンクは15分間有効です。<br>
+              心当たりがない場合は、このメールを破棄してください。
+            </p>
 
             <!-- リンクが機能しない場合 -->
-            <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid #e0e0e0;">
-              <p style="color: #999999; font-size: 13px; line-height: 1.6; margin: 0;">
-                ボタンが機能しない場合は、以下のURLをコピーしてブラウザに貼り付けてください：<br>
-                <a href="${loginUrl}" style="color: #667eea; word-break: break-all;">${loginUrl}</a>
+            <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; font-size: 12px; line-height: 1.5; margin: 0;">
+                ボタンが機能しない場合は、以下のURLをブラウザに貼り付けてください：<br>
+                <a href="${loginUrl}" style="color: #2563eb; word-break: break-all; font-size: 12px;">${loginUrl}</a>
               </p>
             </div>
           </div>
 
           <!-- フッター -->
-          <div style="background: #f8f9fa; padding: 25px; text-align: center; border-top: 1px solid #e0e0e0;">
-            <p style="color: #999999; font-size: 13px; margin: 0 0 10px 0;">
-              このメールはZinAI人材マッチングシステムから自動送信されています。
-            </p>
-            <p style="color: #999999; font-size: 13px; margin: 0;">
+          <div style="background: #f9fafb; padding: 24px 32px; text-align: center; border-top: 1px solid #e5e7eb;">
+            <p style="color: #9ca3af; font-size: 12px; margin: 0;">
               © ${new Date().getFullYear()} ZinAI. All rights reserved.
             </p>
           </div>

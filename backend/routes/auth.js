@@ -86,7 +86,7 @@ router.post('/request-login', async (req, res) => {
   }
 });
 
-// トークン検証とログイン
+// トークン検証（パスワード未設定の場合のみ）
 router.get('/verify/:token', async (req, res) => {
   try {
     const { token } = req.params;
@@ -113,9 +113,130 @@ router.get('/verify/:token', async (req, res) => {
       return res.status(404).json({ error: 'ユーザーが見つかりません' });
     }
 
+    // パスワードが既に設定されている場合は、ログインページにリダイレクト
+    if (user.isPasswordSet) {
+      return res.json({
+        message: 'アカウントは既に設定済みです。ログインしてください。',
+        redirectToLogin: true,
+        email: user.email,
+        userType: user.userType
+      });
+    }
+
+    // パスワード未設定の場合、トークンとユーザー情報を返す
+    res.json({
+      message: 'トークン検証成功',
+      needsPasswordSetup: true,
+      token,
+      user: {
+        email: user.email,
+        name: user.name,
+        userType: user.userType
+      }
+    });
+  } catch (error) {
+    console.error('Token verification error:', error);
+    res.status(500).json({ error: 'トークン検証中にエラーが発生しました' });
+  }
+});
+
+// パスワード設定（初回登録時）
+router.post('/set-password', async (req, res) => {
+  try {
+    const { token, password, type } = req.body;
+
+    if (!token || !password || !type) {
+      return res.status(400).json({ error: 'トークン、パスワード、ユーザータイプは必須です' });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'パスワードは8文字以上である必要があります' });
+    }
+
+    // トークン検証
+    const loginToken = await LoginToken.findOne({
+      token,
+      userType: type,
+      used: false,
+      expiresAt: { $gt: new Date() }
+    });
+
+    if (!loginToken) {
+      return res.status(400).json({ error: '無効または期限切れのトークンです' });
+    }
+
+    // ユーザー取得
+    const user = await User.findOne({
+      email: loginToken.email,
+      userType: loginToken.userType
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'ユーザーが見つかりません' });
+    }
+
+    // パスワードを設定
+    user.password = password;
+    await user.save();
+
     // トークンを使用済みにする
     loginToken.used = true;
     await loginToken.save();
+
+    // 最終ログイン更新
+    user.lastLoginAt = new Date();
+    await user.save();
+
+    // セッションにユーザー情報を保存
+    req.session.userId = user._id;
+    req.session.userType = user.userType;
+
+    res.json({
+      message: 'パスワード設定が完了しました',
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        userType: user.userType,
+        profilePicture: user.profilePicture
+      }
+    });
+  } catch (error) {
+    console.error('Set password error:', error);
+    res.status(500).json({ error: 'パスワード設定中にエラーが発生しました' });
+  }
+});
+
+// パスワードログイン
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password, userType } = req.body;
+
+    if (!email || !password || !userType) {
+      return res.status(400).json({ error: 'メールアドレス、パスワード、ユーザータイプは必須です' });
+    }
+
+    // ユーザー取得（パスワードフィールドも取得）
+    const user = await User.findOne({
+      email,
+      userType
+    }).select('+password');
+
+    if (!user) {
+      return res.status(401).json({ error: 'メールアドレスまたはパスワードが正しくありません' });
+    }
+
+    // パスワードが設定されていない場合
+    if (!user.isPasswordSet) {
+      return res.status(400).json({ error: 'アカウント設定が完了していません。メールからアカウント設定を完了してください。' });
+    }
+
+    // パスワード検証
+    const isPasswordValid = await user.comparePassword(password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'メールアドレスまたはパスワードが正しくありません' });
+    }
 
     // 最終ログイン更新
     user.lastLoginAt = new Date();
@@ -136,8 +257,8 @@ router.get('/verify/:token', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Token verification error:', error);
-    res.status(500).json({ error: 'トークン検証中にエラーが発生しました' });
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'ログイン中にエラーが発生しました' });
   }
 });
 

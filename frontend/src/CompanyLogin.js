@@ -1,50 +1,70 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './CompanyLogin.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function CompanyLogin() {
+  const [loginMode, setLoginMode] = useState('password'); // 'password' or 'magic-link'
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [isNewUser, setIsNewUser] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
 
-  // トークン検証処理
+  useEffect(() => {
+    // ログイン済みのメッセージを表示
+    if (location.state?.message) {
+      setMessage(location.state.message);
+      if (location.state.email) {
+        setEmail(location.state.email);
+      }
+    }
+  }, [location]);
+
+  // トークン検証処理（後方互換性のため残す）
   useEffect(() => {
     const token = searchParams.get('token');
     const type = searchParams.get('type');
 
     if (token && type === 'company') {
-      verifyToken(token);
+      navigate(`/auth/verify?token=${token}&type=${type}`);
     }
-  }, [searchParams]);
+  }, [searchParams, navigate]);
 
-  const verifyToken = async (token) => {
+  const handlePasswordLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    setError('');
+
     try {
-      setLoading(true);
-      const response = await axios.get(`${API_URL}/auth/verify/${token}?type=company`, {
+      const response = await axios.post(`${API_URL}/auth/login`, {
+        email,
+        password,
+        userType: 'company'
+      }, {
         withCredentials: true
       });
 
-      if (response.data.user) {
-        setMessage('ログイン成功！企業ポータルにリダイレクトしています...');
-        setTimeout(() => {
-          navigate('/');
-        }, 1500);
-      }
+      setMessage('ログイン成功！企業ポータルにリダイレクトしています...');
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
     } catch (err) {
-      setError(err.response?.data?.error || 'トークンの検証に失敗しました');
+      setError(err.response?.data?.error || 'ログインに失敗しました');
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleMagicLinkRequest = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
@@ -59,18 +79,6 @@ function CompanyLogin() {
 
       setMessage(response.data.message || 'ログイン用のURLをメールアドレスに送信しました。メールをご確認ください。');
 
-      // 開発環境の場合、マジックリンクを表示
-      if (response.data.developmentUrl) {
-        const confirmNavigate = window.confirm(
-          '開発環境: マジックリンクが生成されました。\n\nコンソールにもURLが出力されています。\n\n今すぐログインしますか？'
-        );
-
-        if (confirmNavigate) {
-          const token = new URL(response.data.developmentUrl).searchParams.get('token');
-          verifyToken(token);
-        }
-      }
-
       setEmail('');
       setName('');
     } catch (err) {
@@ -80,108 +88,157 @@ function CompanyLogin() {
     }
   };
 
-  const handleTestLogin = async () => {
-    setIsNewUser(true);
-    setEmail('test@company.com');
-    setName('テスト企業');
-
-    // 自動でフォーム送信
-    setTimeout(() => {
-      document.querySelector('form').requestSubmit();
-    }, 100);
-  };
-
   return (
     <div className="company-login-container">
       <div className="company-login-box">
         <h1>企業ポータル ログイン</h1>
-        <p className="login-description">
-          メールアドレスを入力してログインリンクを受け取ってください
-        </p>
 
         {message && <div className="success-message">{message}</div>}
         {error && <div className="error-message">{error}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">メールアドレス</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="company@example.com"
-              required
-              disabled={loading}
-            />
-          </div>
+        {/* ログインモード切り替え */}
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '24px',
+          borderBottom: '2px solid #e5e7eb'
+        }}>
+          <button
+            type="button"
+            onClick={() => setLoginMode('password')}
+            style={{
+              flex: 1,
+              padding: '12px',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: loginMode === 'password' ? '2px solid #2563eb' : 'none',
+              color: loginMode === 'password' ? '#2563eb' : '#6b7280',
+              fontWeight: loginMode === 'password' ? '600' : '400',
+              cursor: 'pointer',
+              marginBottom: '-2px'
+            }}
+          >
+            パスワードでログイン
+          </button>
+          <button
+            type="button"
+            onClick={() => setLoginMode('magic-link')}
+            style={{
+              flex: 1,
+              padding: '12px',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: loginMode === 'magic-link' ? '2px solid #2563eb' : 'none',
+              color: loginMode === 'magic-link' ? '#2563eb' : '#6b7280',
+              fontWeight: loginMode === 'magic-link' ? '600' : '400',
+              cursor: 'pointer',
+              marginBottom: '-2px'
+            }}
+          >
+            新規登録
+          </button>
+        </div>
 
-          <div className="form-group checkbox-group">
-            <label>
-              <input
-                type="checkbox"
-                checked={isNewUser}
-                onChange={(e) => setIsNewUser(e.target.checked)}
-                disabled={loading}
-              />
-              新規登録
-            </label>
-          </div>
-
-          {isNewUser && (
+        {loginMode === 'password' ? (
+          // パスワードログインフォーム
+          <form onSubmit={handlePasswordLogin}>
             <div className="form-group">
-              <label htmlFor="name">企業名</label>
+              <label htmlFor="email">メールアドレス</label>
               <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="株式会社〇〇"
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="company@example.com"
                 required
                 disabled={loading}
               />
             </div>
-          )}
 
-          <button type="submit" className="login-button" disabled={loading}>
-            {loading ? '送信中...' : isNewUser ? '登録してログインリンクを送信' : 'ログインリンクを送信'}
-          </button>
-        </form>
+            <div className="form-group">
+              <label htmlFor="password">パスワード</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="パスワードを入力"
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <button type="submit" className="login-button" disabled={loading}>
+              {loading ? 'ログイン中...' : 'ログイン'}
+            </button>
+          </form>
+        ) : (
+          // マジックリンクリクエストフォーム
+          <form onSubmit={handleMagicLinkRequest}>
+            <p className="login-description">
+              メールアドレスを入力して登録用リンクを受け取ってください
+            </p>
+
+            <div className="form-group">
+              <label htmlFor="email">メールアドレス</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="company@example.com"
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-group checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={isNewUser}
+                  onChange={(e) => setIsNewUser(e.target.checked)}
+                  disabled={loading}
+                />
+                新規登録
+              </label>
+            </div>
+
+            {isNewUser && (
+              <div className="form-group">
+                <label htmlFor="name">企業名</label>
+                <input
+                  type="text"
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="株式会社〇〇"
+                  required
+                  disabled={loading}
+                />
+              </div>
+            )}
+
+            <button type="submit" className="login-button" disabled={loading}>
+              {loading ? '送信中...' : isNewUser ? '登録用リンクを送信' : 'ログインリンクを送信'}
+            </button>
+          </form>
+        )}
 
         <div className="login-footer">
-          <p>初めての方は「新規登録」にチェックを入れてください</p>
-          <p style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
-            ※ログインリンクをメールで送信します。メールをご確認ください。
-          </p>
+          {loginMode === 'password' ? (
+            <p style={{ textAlign: 'center', color: '#6b7280', fontSize: '14px' }}>
+              初めての方は「新規登録」タブから登録してください
+            </p>
+          ) : (
+            <>
+              <p>初めての方は「新規登録」にチェックを入れてください</p>
+              <p style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
+                ※登録用リンクをメールで送信します。メールをご確認ください。
+              </p>
+            </>
+          )}
         </div>
-
-        {process.env.NODE_ENV !== 'production' && (
-          <div style={{ marginTop: '20px', padding: '15px', background: '#40414f', borderRadius: '8px' }}>
-            <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#8e8ea0' }}>
-              テスト用アカウント
-            </p>
-            <button
-              onClick={handleTestLogin}
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: '#10a37f',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '16px',
-                fontWeight: '500',
-                cursor: 'pointer'
-              }}
-            >
-              テストアカウントでログイン
-            </button>
-            <p style={{ margin: '10px 0 0 0', fontSize: '12px', color: '#8e8ea0' }}>
-              test@company.com / テスト企業
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
