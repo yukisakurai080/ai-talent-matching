@@ -41,7 +41,7 @@ function SetupAccount() {
 
       if (data.redirectToLogin) {
         // アカウント設定済みの場合、ログイン画面にリダイレクト
-        navigate(`/${type === 'company' ? 'company-login' : 'talent-login'}`, {
+        navigate(`/${type === 'company' ? 'login' : 'talent/login'}`, {
           state: { message: data.message, email: data.email }
         });
         return;
@@ -96,9 +96,9 @@ function SetupAccount() {
 
       // 成功したら、ダッシュボードにリダイレクト
       if (type === 'company') {
-        navigate('/company-dashboard');
+        navigate('/');
       } else {
-        navigate('/talent-dashboard');
+        navigate('/talent/jobs');
       }
     } catch (err) {
       setError(err.message || 'パスワード設定中にエラーが発生しました');
