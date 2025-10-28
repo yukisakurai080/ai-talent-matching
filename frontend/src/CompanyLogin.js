@@ -44,7 +44,7 @@ function CompanyLogin() {
     setError('');
 
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
+      await axios.post(`${API_URL}/auth/login`, {
         email,
         password,
         userType: 'company'
@@ -52,13 +52,10 @@ function CompanyLogin() {
         withCredentials: true
       });
 
-      setMessage('ログイン成功！企業ポータルにリダイレクトしています...');
-      setTimeout(() => {
-        navigate('/');
-      }, 1500);
+      // 即座にリダイレクト
+      window.location.href = '/ZinAI/';
     } catch (err) {
       setError(err.response?.data?.error || 'ログインに失敗しました');
-    } finally {
       setLoading(false);
     }
   };

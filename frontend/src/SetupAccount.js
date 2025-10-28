@@ -94,11 +94,11 @@ function SetupAccount() {
         throw new Error(data.error || 'パスワード設定に失敗しました');
       }
 
-      // 成功したら、ダッシュボードにリダイレクト
+      // 成功したら、ダッシュボードにリダイレクト（ページ全体をリロード）
       if (type === 'company') {
-        navigate('/');
+        window.location.href = '/ZinAI/';
       } else {
-        navigate('/talent/jobs');
+        window.location.href = '/ZinAI/talent/jobs';
       }
     } catch (err) {
       setError(err.message || 'パスワード設定中にエラーが発生しました');
