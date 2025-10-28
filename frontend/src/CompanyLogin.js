@@ -10,7 +10,6 @@ function CompanyLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [isNewUser, setIsNewUser] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -73,16 +72,16 @@ function CompanyLogin() {
     try {
       const response = await axios.post(`${API_URL}/auth/request-login`, {
         email,
-        name: isNewUser ? name : undefined,
+        name,
         userType: 'company'
       });
 
-      setMessage(response.data.message || 'ログイン用のURLをメールアドレスに送信しました。メールをご確認ください。');
+      setMessage(response.data.message || '登録用のURLをメールアドレスに送信しました。メールをご確認ください。');
 
       setEmail('');
       setName('');
     } catch (err) {
-      setError(err.response?.data?.error || 'ログインリクエストに失敗しました');
+      setError(err.response?.data?.error || '登録リクエストに失敗しました');
     } finally {
       setLoading(false);
     }
@@ -101,7 +100,7 @@ function CompanyLogin() {
           display: 'flex',
           gap: '8px',
           marginBottom: '24px',
-          borderBottom: '2px solid #e5e7eb'
+          borderBottom: '2px solid #565869'
         }}>
           <button
             type="button"
@@ -111,14 +110,14 @@ function CompanyLogin() {
               padding: '12px',
               background: 'transparent',
               border: 'none',
-              borderBottom: loginMode === 'password' ? '2px solid #2563eb' : 'none',
-              color: loginMode === 'password' ? '#2563eb' : '#6b7280',
+              borderBottom: loginMode === 'password' ? '2px solid #10a37f' : 'none',
+              color: loginMode === 'password' ? '#10a37f' : '#8e8ea0',
               fontWeight: loginMode === 'password' ? '600' : '400',
               cursor: 'pointer',
               marginBottom: '-2px'
             }}
           >
-            パスワードでログイン
+            ログイン
           </button>
           <button
             type="button"
@@ -128,8 +127,8 @@ function CompanyLogin() {
               padding: '12px',
               background: 'transparent',
               border: 'none',
-              borderBottom: loginMode === 'magic-link' ? '2px solid #2563eb' : 'none',
-              color: loginMode === 'magic-link' ? '#2563eb' : '#6b7280',
+              borderBottom: loginMode === 'magic-link' ? '2px solid #10a37f' : 'none',
+              color: loginMode === 'magic-link' ? '#10a37f' : '#8e8ea0',
               fontWeight: loginMode === 'magic-link' ? '600' : '400',
               cursor: 'pointer',
               marginBottom: '-2px'
@@ -173,10 +172,10 @@ function CompanyLogin() {
             </button>
           </form>
         ) : (
-          // マジックリンクリクエストフォーム
+          // 新規登録フォーム
           <form onSubmit={handleMagicLinkRequest}>
             <p className="login-description">
-              メールアドレスを入力して登録用リンクを受け取ってください
+              メールアドレスと企業名を入力して登録用リンクを受け取ってください
             </p>
 
             <div className="form-group">
@@ -192,51 +191,34 @@ function CompanyLogin() {
               />
             </div>
 
-            <div className="form-group checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={isNewUser}
-                  onChange={(e) => setIsNewUser(e.target.checked)}
-                  disabled={loading}
-                />
-                新規登録
-              </label>
+            <div className="form-group">
+              <label htmlFor="name">企業名</label>
+              <input
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="株式会社〇〇"
+                required
+                disabled={loading}
+              />
             </div>
 
-            {isNewUser && (
-              <div className="form-group">
-                <label htmlFor="name">企業名</label>
-                <input
-                  type="text"
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="株式会社〇〇"
-                  required
-                  disabled={loading}
-                />
-              </div>
-            )}
-
             <button type="submit" className="login-button" disabled={loading}>
-              {loading ? '送信中...' : isNewUser ? '登録用リンクを送信' : 'ログインリンクを送信'}
+              {loading ? '送信中...' : '登録用リンクを送信'}
             </button>
           </form>
         )}
 
         <div className="login-footer">
           {loginMode === 'password' ? (
-            <p style={{ textAlign: 'center', color: '#6b7280', fontSize: '14px' }}>
+            <p style={{ textAlign: 'center', color: '#8e8ea0', fontSize: '14px' }}>
               初めての方は「新規登録」タブから登録してください
             </p>
           ) : (
-            <>
-              <p>初めての方は「新規登録」にチェックを入れてください</p>
-              <p style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
-                ※登録用リンクをメールで送信します。メールをご確認ください。
-              </p>
-            </>
+            <p style={{ textAlign: 'center', color: '#8e8ea0', fontSize: '14px' }}>
+              登録用リンクをメールで送信します。メールをご確認ください。
+            </p>
           )}
         </div>
       </div>
