@@ -193,6 +193,15 @@ router.post('/set-password', async (req, res) => {
         return res.status(500).json({ error: 'セッション保存中にエラーが発生しました' });
       }
 
+      // 手動でセッションCookieを設定
+      res.cookie('connect.sid', 's:' + req.sessionID, {
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        path: '/'
+      });
+
       res.json({
         message: 'パスワード設定が完了しました',
         user: {
@@ -260,7 +269,17 @@ router.post('/login', async (req, res) => {
 
       console.log('Login: Session saved successfully. Session ID:', req.sessionID);
       console.log('Login: Session cookie:', req.session.cookie);
-      console.log('Login: Response headers before send:', res.getHeaders());
+
+      // 手動でセッションCookieを設定
+      res.cookie('connect.sid', 's:' + req.sessionID, {
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        path: '/'
+      });
+
+      console.log('Login: Response headers after cookie set:', res.getHeaders());
 
       res.json({
         message: 'ログイン成功',
@@ -272,8 +291,6 @@ router.post('/login', async (req, res) => {
           profilePicture: user.profilePicture
         }
       });
-
-      console.log('Login: Response headers after send:', res.getHeaders());
     });
   } catch (error) {
     console.error('Login error:', error);
