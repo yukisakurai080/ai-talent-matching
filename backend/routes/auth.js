@@ -34,6 +34,12 @@ router.post('/request-login', async (req, res) => {
       });
 
       await user.save();
+    } else {
+      // 既存ユーザーの場合、名前が提供されていれば更新
+      if (name && user.name !== name) {
+        user.name = name;
+        await user.save();
+      }
     }
 
     // ログイントークン生成
