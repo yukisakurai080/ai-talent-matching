@@ -40,7 +40,8 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+// cookie-parserを削除（express-sessionと競合するため）
+// app.use(cookieParser());
 
 // セッション設定
 app.use(session({
