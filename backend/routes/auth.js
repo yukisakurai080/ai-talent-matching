@@ -18,29 +18,28 @@ router.post('/request-login', async (req, res) => {
       return res.status(400).json({ error: '無効なユーザータイプです' });
     }
 
-    // ユーザーを検索または作成
+    // ユーザーを検索
     let user = await User.findOne({ email, userType });
 
-    if (!user) {
-      // 新規ユーザー作成
-      if (!name) {
-        return res.status(400).json({ error: '新規登録には名前が必要です' });
-      }
-
-      user = new User({
-        email,
-        name,
-        userType
+    // 既存ユーザーがいる場合はエラーを返す
+    if (user) {
+      return res.status(400).json({
+        error: 'このメールアドレスは既に登録されています。「ログイン」タブからログインしてください。'
       });
-
-      await user.save();
-    } else {
-      // 既存ユーザーの場合、名前が提供されていれば更新
-      if (name && user.name !== name) {
-        user.name = name;
-        await user.save();
-      }
     }
+
+    // 新規ユーザー作成
+    if (!name) {
+      return res.status(400).json({ error: '企業名は必須です' });
+    }
+
+    user = new User({
+      email,
+      name,
+      userType
+    });
+
+    await user.save();
 
     // ログイントークン生成
     const token = crypto.randomBytes(32).toString('hex');
