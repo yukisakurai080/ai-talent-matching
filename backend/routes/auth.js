@@ -259,6 +259,8 @@ router.post('/login', async (req, res) => {
       }
 
       console.log('Login: Session saved successfully. Session ID:', req.sessionID);
+      console.log('Login: Session cookie:', req.session.cookie);
+      console.log('Login: Response headers before send:', res.getHeaders());
 
       res.json({
         message: 'ログイン成功',
@@ -270,6 +272,8 @@ router.post('/login', async (req, res) => {
           profilePicture: user.profilePicture
         }
       });
+
+      console.log('Login: Response headers after send:', res.getHeaders());
     });
   } catch (error) {
     console.error('Login error:', error);
