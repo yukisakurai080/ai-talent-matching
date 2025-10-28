@@ -194,12 +194,14 @@ router.post('/set-password', async (req, res) => {
       }
 
       // 手動でセッションCookieを設定
-      res.cookie('connect.sid', 's:' + req.sessionID, {
+      // domain を設定せず、ブラウザに自動的に設定させる
+      res.cookie('connect.sid', req.sessionID, {
         maxAge: 1000 * 60 * 60 * 24 * 7,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        path: '/'
+        path: '/',
+        signed: false // 署名なしCookie
       });
 
       res.json({
@@ -271,12 +273,14 @@ router.post('/login', async (req, res) => {
       console.log('Login: Session cookie:', req.session.cookie);
 
       // 手動でセッションCookieを設定
-      res.cookie('connect.sid', 's:' + req.sessionID, {
+      // domain を設定せず、ブラウザに自動的に設定させる
+      res.cookie('connect.sid', req.sessionID, {
         maxAge: 1000 * 60 * 60 * 24 * 7,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        path: '/'
+        path: '/',
+        signed: false // 署名なしCookie
       });
 
       console.log('Login: Response headers after cookie set:', res.getHeaders());
