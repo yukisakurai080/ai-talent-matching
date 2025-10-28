@@ -186,15 +186,23 @@ router.post('/set-password', async (req, res) => {
     req.session.userId = user._id;
     req.session.userType = user.userType;
 
-    res.json({
-      message: 'パスワード設定が完了しました',
-      user: {
-        id: user._id,
-        email: user.email,
-        name: user.name,
-        userType: user.userType,
-        profilePicture: user.profilePicture
+    // セッションを明示的に保存してからレスポンスを送信
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.status(500).json({ error: 'セッション保存中にエラーが発生しました' });
       }
+
+      res.json({
+        message: 'パスワード設定が完了しました',
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name,
+          userType: user.userType,
+          profilePicture: user.profilePicture
+        }
+      });
     });
   } catch (error) {
     console.error('Set password error:', error);
@@ -241,15 +249,23 @@ router.post('/login', async (req, res) => {
     req.session.userId = user._id;
     req.session.userType = user.userType;
 
-    res.json({
-      message: 'ログイン成功',
-      user: {
-        id: user._id,
-        email: user.email,
-        name: user.name,
-        userType: user.userType,
-        profilePicture: user.profilePicture
+    // セッションを明示的に保存してからレスポンスを送信
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.status(500).json({ error: 'セッション保存中にエラーが発生しました' });
       }
+
+      res.json({
+        message: 'ログイン成功',
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name,
+          userType: user.userType,
+          profilePicture: user.profilePicture
+        }
+      });
     });
   } catch (error) {
     console.error('Login error:', error);
