@@ -249,12 +249,16 @@ router.post('/login', async (req, res) => {
     req.session.userId = user._id;
     req.session.userType = user.userType;
 
+    console.log('Login: Attempting to save session for user:', user.email, 'Session ID:', req.sessionID);
+
     // セッションを明示的に保存してからレスポンスを送信
     req.session.save((err) => {
       if (err) {
         console.error('Session save error:', err);
         return res.status(500).json({ error: 'セッション保存中にエラーが発生しました' });
       }
+
+      console.log('Login: Session saved successfully. Session ID:', req.sessionID);
 
       res.json({
         message: 'ログイン成功',
