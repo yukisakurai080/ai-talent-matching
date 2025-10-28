@@ -216,7 +216,7 @@ function CompanyLogin() {
               初めての方は「新規登録」タブから登録してください
             </p>
           ) : (
-            <p style={{ textAlign: 'center', color: '#8e8ea0', fontSize: '14px' }}>
+            <p style={{ textAlign: 'center', color: '#ececf1', fontSize: '14px' }}>
               登録用リンクをメールで送信します。メールをご確認ください。
             </p>
           )}

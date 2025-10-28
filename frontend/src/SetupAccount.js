@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function SetupAccount() {
   const [searchParams] = useSearchParams();
@@ -29,7 +29,7 @@ function SetupAccount() {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/verify/${token}?type=${type}`, {
+      const response = await fetch(`${API_URL}/auth/verify/${token}?type=${type}`, {
         credentials: 'include'
       });
 
@@ -79,7 +79,7 @@ function SetupAccount() {
       const token = searchParams.get('token');
       const type = searchParams.get('type');
 
-      const response = await fetch(`${API_URL}/api/auth/set-password`, {
+      const response = await fetch(`${API_URL}/auth/set-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
